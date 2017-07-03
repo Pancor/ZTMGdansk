@@ -1,0 +1,36 @@
+ext.getVersionNameApp = { ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'describe', '--dirty'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim() + '-' + getSHA()
+    }
+    catch (ignored) {
+        return null;
+    }
+}
+
+ext.getSHA = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short' , 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+ext.getVersionCodeApp = { ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--first-parent', '--count', 'origin/master'
+            standardOutput = stdout
+        }
+        return Integer.parseInt(stdout.toString().trim()) * 100
+    }
+    catch (ignored) {
+        return -1;
+    }
+}
