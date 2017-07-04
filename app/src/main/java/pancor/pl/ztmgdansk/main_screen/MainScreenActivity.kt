@@ -1,9 +1,10 @@
-package pancor.pl.ztmgdansk
+package pancor.pl.ztmgdansk.main_screen
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import pancor.pl.ztmgdansk.R
 
-class MainScreen : AppCompatActivity() {
+class MainScreenActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
