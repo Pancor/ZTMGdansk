@@ -12,7 +12,7 @@ class MainScreenAdapter(val items: List<RecyclerActionItem>) :
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent?.context)
-        val view = inflater.inflate(R.layout.act_main_screen, parent, false)
+        val view = inflater.inflate(R.layout.holder_main_screen, parent, false)
         return ViewHolder(view)
     }
 
