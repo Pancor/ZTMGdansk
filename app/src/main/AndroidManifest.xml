@@ -23,5 +23,8 @@
         <activity
             android:name=".main_screen.MainScreenActivity" />
 
+        <activity
+            android:name=".search_bus.SearchBusActivity" />
+
     </application>
 </manifest>

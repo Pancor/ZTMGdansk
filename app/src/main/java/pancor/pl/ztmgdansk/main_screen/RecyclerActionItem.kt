@@ -1,6 +1,6 @@
 package pancor.pl.ztmgdansk.main_screen
 
-object RecyclerActionItemCons{
+object RecyclerActionItemCons {
     val TIMETABLE: Int = 100
 }
 

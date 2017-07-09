@@ -1,5 +1,6 @@
 package pancor.pl.ztmgdansk.main_screen
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
@@ -7,10 +8,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fr_main_screen.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.*
+import pancor.pl.ztmgdansk.search_bus.SearchBusActivity
 import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.ui.CustomDividerItemDecoration
 
@@ -29,8 +30,9 @@ class MainScreenFragment : Fragment(), MainScreenAdapter.OnRecyclerItemClickList
         setupRecyclerView()
     }
 
-    override fun onItemClick(position: Int, itemType: Int) {
-        Toast.makeText(context, "Position: $position, itemType: $itemType", Toast.LENGTH_LONG).show()
+    override fun onTimeTableClick() {
+        val intent = Intent(context, SearchBusActivity::class.java)
+        startActivity(intent)
     }
 
     fun setupRecyclerView(){
@@ -38,16 +40,17 @@ class MainScreenFragment : Fragment(), MainScreenAdapter.OnRecyclerItemClickList
 
         val grid = GridLayoutManager(context, 1)
         recyclerView.layoutManager = grid
-        val list = getRecyclerViewList()
 
         val space = OtherUtils().getPixelsFromDP(context, RECYCLER_ITEM_DIVIDER_IN_DP)
         val decorator: RecyclerView.ItemDecoration = CustomDividerItemDecoration(space)
         recyclerView.addItemDecoration(decorator)
 
+        val list = getRecyclerViewList()
         val adapter = MainScreenAdapter(list, this)
         recyclerView.adapter = adapter
     }
 
+    //TODO make it beautiful
     fun getRecyclerViewList(): List<RecyclerActionItem>{
         val list = ArrayList<RecyclerActionItem>()
         list.add(RecyclerActionItem(RecyclerActionItemCons.TIMETABLE,
