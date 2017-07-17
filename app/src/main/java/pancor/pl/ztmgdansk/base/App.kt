@@ -17,7 +17,7 @@ class App : Application() {
 
     private fun getBusDataComponent() : BusDataComponent {
         return DaggerBusDataComponent.builder()
-                .appModule(AppModule(applicationContext))
+                .context(applicationContext)
                 .busDataModule(BusDataModule())
                 .build()
     }

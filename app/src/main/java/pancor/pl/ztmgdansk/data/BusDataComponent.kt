@@ -1,14 +1,21 @@
 package pancor.pl.ztmgdansk.data
 
+import android.content.Context
+import dagger.BindsInstance
 import dagger.Component
-import pancor.pl.ztmgdansk.base.AppModule
-import pancor.pl.ztmgdansk.data.BusDataManager
-import pancor.pl.ztmgdansk.data.BusDataModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(BusDataModule::class, AppModule::class))
+@Component(modules = arrayOf(BusDataModule::class))
 interface BusDataComponent {
 
     fun getBusDataManager() : BusDataManager
+
+    @Component.Builder
+    interface Builder {
+
+        fun build(): BusDataComponent
+        @BindsInstance fun context(context: Context): Builder
+        fun busDataModule(busDataModule: BusDataModule): Builder
+    }
 }
