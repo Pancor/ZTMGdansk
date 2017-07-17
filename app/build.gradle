@@ -26,7 +26,7 @@ android {
 ext {
     androidVersion = '25.3.1'
     glideVersion = '3.7.0'
-    daggerVersion = '2.5'
+    daggerVersion = '2.8'
 }
 
 dependencies {
