@@ -27,6 +27,7 @@ ext {
     androidVersion = '25.3.1'
     glideVersion = '3.7.0'
     daggerVersion = '2.9'
+    retrofitVersion = '2.2.0'
 }
 
 dependencies {
@@ -47,6 +48,17 @@ dependencies {
     //dagger
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     compile "com.google.dagger:dagger:$daggerVersion"
+
+    //retrofit
+    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+
+    //net
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.okio:okio:1.7.0'
+
 }
 repositories {
     mavenCentral()
