@@ -28,6 +28,8 @@ ext {
     glideVersion = '3.7.0'
     daggerVersion = '2.9'
     retrofitVersion = '2.2.0'
+    rxJavaVersion = '2.0.1'
+    rxKotlinVersion = '2.0.0'
 }
 
 dependencies {
@@ -58,6 +60,11 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.squareup.okio:okio:1.7.0'
+
+    //rx
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rxJavaVersion"
 
 }
 repositories {
