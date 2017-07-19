@@ -38,12 +38,13 @@ import javax.inject.Singleton
         return client.build()
     }
 
-    @Provides @Singleton fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
+    @Provides @Singleton fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): NetService {
         return Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(""/* TODO add base URL*/)
                 .client(okHttpClient)
                 .build()
+                .create(NetService::class.java)
     }
 }

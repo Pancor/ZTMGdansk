@@ -7,7 +7,15 @@ import javax.inject.Singleton
 @Singleton
 class LocalBusDataManager(val context: Context) : BusDataContract {
 
-    override fun getRoutesAndStops(callback: BusDataContract.LoadRoutesAndStopsCallback) {
+    override fun getRoutesAndBusStops(callback: BusDataContract.LoadRoutesAndStopsCallback) {
         
+    }
+
+    override fun onStart() {
+
+    }
+
+    override fun onStop() {
+
     }
 }

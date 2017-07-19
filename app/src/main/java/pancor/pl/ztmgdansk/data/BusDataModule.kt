@@ -7,6 +7,7 @@ import pancor.pl.ztmgdansk.data.local.LocalBusDataManager
 import pancor.pl.ztmgdansk.data.local.LocalScope
 import pancor.pl.ztmgdansk.data.remote.RemoteBusDataManager
 import pancor.pl.ztmgdansk.data.remote.RemoteScope
+import pancor.pl.ztmgdansk.data.remote.net.NetService
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -17,7 +18,7 @@ import javax.inject.Singleton
         return LocalBusDataManager(context)
     }
 
-    @Provides @Singleton @RemoteScope fun provideRemoteBusDataManager(retrofit: Retrofit) : BusDataContract {
-        return RemoteBusDataManager(retrofit)
+    @Provides @Singleton @RemoteScope fun provideRemoteBusDataManager(netService: NetService) : BusDataContract {
+        return RemoteBusDataManager(netService)
     }
 }

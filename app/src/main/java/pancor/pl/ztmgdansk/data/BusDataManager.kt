@@ -9,7 +9,17 @@ import javax.inject.Singleton
 class BusDataManager @Inject constructor(@LocalScope val localBusDataManager: BusDataContract,
                                          @RemoteScope val remoteBusDataManager: BusDataContract) : BusDataContract {
 
-    override fun getRoutesAndStops(callback: BusDataContract.LoadRoutesAndStopsCallback) {
+    override fun getRoutesAndBusStops(callback: BusDataContract.LoadRoutesAndStopsCallback) {
 
+    }
+
+    override fun onStart() {
+        localBusDataManager.onStart()
+        remoteBusDataManager.onStart()
+    }
+
+    override fun onStop() {
+        localBusDataManager.onStop()
+        remoteBusDataManager.onStop()
     }
 }
