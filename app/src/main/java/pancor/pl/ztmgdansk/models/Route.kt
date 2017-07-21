@@ -1,3 +1,9 @@
 package pancor.pl.ztmgdansk.models
 
-data class Route(val routeId: Int, val routeShortName: String, val routeLongName: String)
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
+
+@Entity
+data class Route(@PrimaryKey val routeId: Int,
+                 val routeShortName: String,
+                 val routeLongName: String)
