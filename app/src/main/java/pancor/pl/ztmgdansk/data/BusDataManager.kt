@@ -1,24 +1,31 @@
 package pancor.pl.ztmgdansk.data
 
 import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
-import pancor.pl.ztmgdansk.data.local.LocalScope
-import pancor.pl.ztmgdansk.data.remote.RemoteScope
+import pancor.pl.ztmgdansk.data.local.LocalBusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BusDataManager @Inject constructor(@LocalScope val localBusDataManager: BusDataContract,
-                                         @RemoteScope val remoteBusDataManager: BusDataContract) : BusDataContract {
+class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataContract,
+                                         val remoteBusDataManager: BusDataContract) : BusDataContract {
 
     override fun getBusRoutes(): Flowable<List<Route>> {
-        return Flowable.empty()
+        val networkWithSave: Flowable<List<Route>> = remoteBusDataManager.getBusRoutes()
+                .doOnNext { localBusDataManager.insertBusRoutes(it) }
+        return Flowable.concat(localBusDataManager.getBusRoutes(),
+                               networkWithSave)
+                .elementAt(0)
+                .toFlowable()
     }
 
     override fun getBusStops(): Flowable<List<BusStop>> {
-        return Flowable.empty()
+        val networkWithSave: Flowable<List<BusStop>> = remoteBusDataManager.getBusStops()
+                .doOnNext { localBusDataManager.insertBusStops(it) }
+        return Flowable.concat(localBusDataManager.getBusStops(),
+                               networkWithSave)
+                .elementAt(0)
+                .toFlowable()
     }
 }
