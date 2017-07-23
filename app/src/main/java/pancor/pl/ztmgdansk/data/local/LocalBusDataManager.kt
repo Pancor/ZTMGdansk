@@ -18,7 +18,7 @@ class LocalBusDataManager(val busDao: BusDao) : LocalBusDataContract {
     }
 
     override fun insertBusRoutes(busRoutes: List<Route>) {
-
+        busDao.insertOrReplaceRoutes(busRoutes)
     }
 
     override fun getBusStops(): Flowable<List<BusStop>> {
@@ -27,6 +27,6 @@ class LocalBusDataManager(val busDao: BusDao) : LocalBusDataContract {
     }
 
     override fun insertBusStops(busStops: List<BusStop>) {
-
+        busDao.insertOrReplaceBusStops(busStops)
     }
 }
