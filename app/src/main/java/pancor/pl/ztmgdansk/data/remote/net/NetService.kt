@@ -8,9 +8,9 @@ import retrofit2.http.GET
 
 interface NetService {
 
-    @GET(""/*TODO get www address*/)
+    @GET("getBusRoutes")
     fun getRoutes(): Single<ServerResponse<Route>>
 
-    @GET(""/*TODO get www address*/)
+    @GET("getBusStops")
     fun getBusStops(): Single<ServerResponse<BusStop>>
 }

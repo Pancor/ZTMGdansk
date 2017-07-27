@@ -15,6 +15,8 @@ import javax.inject.Singleton
 
 @Module class NetModule {
 
+    val BASE_URL = "http://panekpawel.pl/ztm/v1/"
+
     @Provides @Singleton fun provideHttpCache(app: Application): Cache {
         val cacheSize: Long = 10 * 1024 * 1024
         return Cache(app.cacheDir, cacheSize)
@@ -42,7 +44,7 @@ import javax.inject.Singleton
         return Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(""/* TODO add base URL*/)
+                .baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .build()
                 .create(NetService::class.java)
