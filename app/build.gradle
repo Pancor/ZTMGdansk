@@ -35,6 +35,7 @@ ext {
     rxJavaVersion = '2.0.1'
     rxKotlinVersion = '2.0.0'
     roomVersion = '1.0.0-alpha5'
+    mockitoVersion = '2.7.22'
 }
 
 dependencies {
@@ -75,6 +76,10 @@ dependencies {
     compile "android.arch.persistence.room:runtime:1.0.0-alpha5"
     compile "android.arch.persistence.room:rxjava2:1.0.0-alpha5"
     kapt "android.arch.persistence.room:compiler:1.0.0-alpha5"
+
+    //mockito
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    androidTestCompile "org.mockito:mockito-android:$mockitoVersion"
 
 }
 repositories {
