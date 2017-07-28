@@ -38,6 +38,7 @@ ext {
     roomVersion = '1.0.0-alpha5'
     mockitoVersion = '2.7.22'
     androidTestVersion = '0.5'
+    debugDbVersion = '1.0.1'
 }
 
 dependencies {
@@ -75,9 +76,10 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:$rxJavaVersion"
 
     //room
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha5"
-    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha5"
-    kapt "android.arch.persistence.room:compiler:1.0.0-alpha5"
+    debugCompile "com.amitshekhar.android:debug-db:$debugDbVersion"
+    compile "android.arch.persistence.room:runtime:$roomVersion"
+    compile "android.arch.persistence.room:rxjava2:$roomVersion"
+    kapt "android.arch.persistence.room:compiler:$roomVersion"
 
     //mockito
     testCompile "org.mockito:mockito-core:$mockitoVersion"
