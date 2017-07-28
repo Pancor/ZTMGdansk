@@ -10,4 +10,6 @@ interface LocalBusDataContract : BusDataContract {
     fun insertBusRoutes(busRoutes: List<Route>)
 
     fun insertBusStops(busStops: List<BusStop>)
+
+    fun deleteData()
 }

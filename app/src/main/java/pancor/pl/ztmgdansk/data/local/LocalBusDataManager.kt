@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Singleton
-class LocalBusDataManager(val busDao: BusDao) : LocalBusDataContract {
+class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
 
-    val TIMEOUT_IN_SECONDS = 2L
+    private val TIMEOUT_IN_SECONDS = 2L
 
     override fun getBusRoutes(): Flowable<List<Route>> {
         return busDao.getAllRoutes()
@@ -28,5 +28,9 @@ class LocalBusDataManager(val busDao: BusDao) : LocalBusDataContract {
 
     override fun insertBusStops(busStops: List<BusStop>) {
         busDao.insertOrReplaceBusStops(busStops)
+    }
+
+    override fun deleteData() {
+        busDao.deleteData()
     }
 }
