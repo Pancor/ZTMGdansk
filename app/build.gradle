@@ -37,6 +37,7 @@ ext {
     rxKotlinVersion = '2.0.0'
     roomVersion = '1.0.0-alpha5'
     mockitoVersion = '2.7.22'
+    androidTestVersion = '0.5'
 }
 
 dependencies {
@@ -82,6 +83,10 @@ dependencies {
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     androidTestCompile "org.mockito:mockito-android:$mockitoVersion"
 
+    //test
+    androidTestCompile "com.android.support:support-annotations:$androidVersion"
+    androidTestCompile "com.android.support.test:runner:$androidTestVersion"
+    androidTestCompile "com.android.support.test:rules:$androidTestVersion"
 }
 repositories {
     mavenCentral()
