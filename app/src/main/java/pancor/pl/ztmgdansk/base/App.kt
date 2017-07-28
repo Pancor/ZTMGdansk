@@ -8,14 +8,13 @@ import pancor.pl.ztmgdansk.data.DaggerBusDataComponent
 import pancor.pl.ztmgdansk.data.local.database.BusDatabase
 import pancor.pl.ztmgdansk.data.remote.net.NetModule
 
-
 class App : Application() {
 
-    val busDataComponentBuild = getBusDataComponent()
+    lateinit var busDataComponentBuild: BusDataComponent
 
     override fun onCreate(){
         super.onCreate()
-
+        busDataComponentBuild = getBusDataComponent()
     }
 
     private fun getBusDataComponent() : BusDataComponent {
