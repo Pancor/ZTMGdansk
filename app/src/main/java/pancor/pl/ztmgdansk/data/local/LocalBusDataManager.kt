@@ -31,6 +31,7 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
     }
 
     override fun deleteData() {
-        busDao.deleteData()
+        busDao.deleteAllBusRoutes()
+        busDao.deleteAllBusStops()
     }
 }

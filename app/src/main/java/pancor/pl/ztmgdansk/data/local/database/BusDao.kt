@@ -14,13 +14,15 @@ interface BusDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplaceRoutes(routes: List<Route>)
 
+    @Query("DELETE FROM Route;")
+    fun deleteAllBusRoutes()
+
     @Query("SELECT * FROM BusStop;")
     fun getAllBusStops(): Flowable<List<BusStop>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplaceBusStops(busStops: List<BusStop>)
 
-    @Query("DELETE TABLE BusStop;" +
-            "DELETE TABLE Route;")
-    fun deleteData()
+    @Query("DELETE FROM BusStop;")
+    fun deleteAllBusStops()
 }
