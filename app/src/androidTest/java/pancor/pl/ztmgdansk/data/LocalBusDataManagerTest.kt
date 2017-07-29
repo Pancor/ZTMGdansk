@@ -4,7 +4,10 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
+import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
+import junit.framework.Assert
+import org.hamcrest.collection.IsIterableContainingInAnyOrder
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +43,7 @@ class LocalBusDataManagerTest {
     fun insertRoutesThenGetItBack() {
         localBusDataManager.insertBusRoutes(ROUTES)
         localBusDataManager.getBusRoutes().subscribe(testSubscriber)
+        testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(ROUTES)
     }
 
@@ -47,6 +51,7 @@ class LocalBusDataManagerTest {
     fun insertBusStopsThenGetItBack() {
         localBusDataManager.insertBusStops(STOPS)
         localBusDataManager.getBusStops().subscribe(testSubscriber)
+        testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(STOPS)
     }
 }
