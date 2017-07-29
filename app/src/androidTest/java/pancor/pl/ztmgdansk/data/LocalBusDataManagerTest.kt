@@ -25,24 +25,27 @@ class LocalBusDataManagerTest {
     private val STOPS = listOf(BusStop(1, "Stop1"), BusStop(2, "Stop2"))
 
     private lateinit var localBusDataManager: LocalBusDataManager
+    private lateinit var database: BusDatabase
     private val testSubscriber = TestSubscriber<Any>()
 
     @Before
     fun setupLocalBusDataManager() {
-        val db = Room.databaseBuilder(InstrumentationRegistry.getTargetContext(),
+        database = Room.databaseBuilder(InstrumentationRegistry.getTargetContext(),
                 BusDatabase::class.java, "ztm_database").build()
-        localBusDataManager = LocalBusDataManager(db.getBusDao())
+        localBusDataManager = LocalBusDataManager(database.getBusDao())
     }
 
     @After
     fun cleanUp() {
         localBusDataManager.deleteData()
+        database.close()
     }
 
     @Test
     fun insertRoutesThenGetItBack() {
         localBusDataManager.insertBusRoutes(ROUTES)
         localBusDataManager.getBusRoutes().subscribe(testSubscriber)
+
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(ROUTES)
     }
@@ -51,7 +54,28 @@ class LocalBusDataManagerTest {
     fun insertBusStopsThenGetItBack() {
         localBusDataManager.insertBusStops(STOPS)
         localBusDataManager.getBusStops().subscribe(testSubscriber)
+
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(STOPS)
+    }
+
+    @Test
+    fun insertTwoTimesTheSameBusStops() {
+        localBusDataManager.insertBusStops(STOPS)
+        localBusDataManager.insertBusStops(STOPS)
+        localBusDataManager.getBusStops().subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(STOPS)
+    }
+
+    @Test
+    fun insertTwoTimesTheSameRoutes() {
+        localBusDataManager.insertBusRoutes(ROUTES)
+        localBusDataManager.insertBusRoutes(ROUTES)
+        localBusDataManager.getBusRoutes().subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(ROUTES)
     }
 }

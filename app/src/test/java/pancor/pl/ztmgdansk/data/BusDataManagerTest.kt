@@ -77,4 +77,44 @@ class BusDataManagerTest {
         verify(localBusDataManager).getBusStops()
         testSubscriber.assertValue(STOPS)
     }
+
+    @Test
+    fun getStopsFromRemoteThenCheckIfStopsAreInsertedToLocalDatabase() {
+        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.empty())
+        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
+
+        busDataManager.getBusStops().subscribe()
+
+        verify(localBusDataManager).insertBusStops(STOPS)
+    }
+
+    @Test
+    fun getRoutesFromRemoteThenCheckIfRoutesAreInsertedToLocalDatabase() {
+        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.empty())
+        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
+
+        busDataManager.getBusRoutes().subscribe()
+
+        verify(localBusDataManager).insertBusRoutes(ROUTES)
+    }
+
+    @Test
+    fun getStopsThenCheckIfOnlyOnTimeStopsAreEmitted() {
+        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
+        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
+
+        busDataManager.getBusStops().subscribe(testSubscriber)
+
+        testSubscriber.assertValueCount(1)
+    }
+
+    @Test
+    fun getRoutesThenCheckIfOnlyOnTimeRoutesAreEmitted() {
+        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
+        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
+
+        busDataManager.getBusRoutes().subscribe(testSubscriber)
+
+        testSubscriber.assertValueCount(1)
+    }
 }
