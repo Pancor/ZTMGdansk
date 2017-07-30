@@ -9,11 +9,12 @@
     android:background="@drawable/shape_white_rounded"
     app:navigationIcon="?attr/homeAsUpIndicator">
 
-    <AutoCompleteTextView
+    <android.support.design.widget.TextInputEditText
         android:id="@+id/searchInputView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
+        android:maxLines="1"
         android:hint="@string/search" />
 
 </android.support.v7.widget.Toolbar>

@@ -13,7 +13,7 @@ import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.*
 import pancor.pl.ztmgdansk.search_bus.SearchBusActivity
 import pancor.pl.ztmgdansk.tools.OtherUtils
-import pancor.pl.ztmgdansk.tools.ui.CustomDividerItemDecoration
+import pancor.pl.ztmgdansk.tools.CustomDividerItemDecoration
 
 class MainScreenFragment : Fragment(), MainScreenAdapter.OnRecyclerItemClickListener {
 
