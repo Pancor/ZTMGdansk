@@ -8,10 +8,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.act_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.act_search_bus
+import pancor.pl.ztmgdansk.base.App
 import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.CustomSearchView.OnBackNavigationClickListener
+import javax.inject.Inject
 
 class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
+
+    @Inject lateinit var presenter: SearchBusPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +30,21 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
     }
 
     private fun setupFragment(){
-        var searchBusFragment: Fragment? = supportFragmentManager.findFragmentById(R.id.container)
+        var searchBusFragment: SearchBusFragment? = supportFragmentManager
+                .findFragmentById(R.id.container) as SearchBusFragment?
         if (searchBusFragment == null){
             searchBusFragment = SearchBusFragment()
             OtherUtils().addFragmentToActivity(supportFragmentManager,
                     searchBusFragment, R.id.container)
         }
+        setupInjection(searchBusFragment)
+    }
+
+    private fun setupInjection(view: SearchBusFragment) {
+        DaggerSearchBusComponent.builder()
+                .dataManager((application as App).busDataComponentBuild)
+                .view(view)
+                .build().inject(this)
     }
 
     private fun setupSearchView() {
