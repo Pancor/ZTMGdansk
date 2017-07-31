@@ -1,10 +1,8 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.act_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.act_search_bus
@@ -49,7 +47,6 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
 
     private fun setupSearchView() {
         searchView.setBackNavigationListener(this)
-        searchView.getTextChangeObservable()
-                .subscribe { text -> Toast.makeText(this, text, Toast.LENGTH_LONG).show() }
+        presenter.setupSearchViewObservable(searchView.getTextChangeObservable())
     }
 }
