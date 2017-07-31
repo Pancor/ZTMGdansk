@@ -36,10 +36,26 @@ class RemoteBusDataManager(private val netService: NetService) : BusDataContract
     }
 
     override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return netService.getBusStopsByQuery(query)
+                .flatMap { (isError, _, response) ->
+                    if (!isError){
+                        Single.just(response)
+                    } else {
+                        Single.error(Exception("Server connection error"))
+                    }
+                }
+                .toFlowable()
     }
 
     override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return netService.getBusRoutesByQuery(query)
+                .flatMap { (isError, _, response) ->
+                    if (!isError){
+                        Single.just(response)
+                    } else {
+                        Single.error(Exception("Server connection error"))
+                    }
+                }
+                .toFlowable()
     }
 }
