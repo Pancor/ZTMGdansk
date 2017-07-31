@@ -11,8 +11,8 @@ interface BusDao {
     @Query("SELECT * FROM Route;")
     fun getAllRoutes(): Flowable<List<Route>>
 
-    @Query("SELECT * FROM Route WHERE routeShortName LIKE '%:query%' " +
-            "OR routeLongName LIKE '%:query%';")
+    @Query("SELECT * FROM Route WHERE routeShortName LIKE :query " +
+            "OR routeLongName LIKE :query;")
     fun getRoutesByQuery(query: String): Flowable<List<Route>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -24,7 +24,7 @@ interface BusDao {
     @Query("SELECT * FROM BusStop;")
     fun getAllBusStops(): Flowable<List<BusStop>>
 
-    @Query("SELECT * FROM BusStop WHERE stopName LIKE '%:query%';")
+    @Query("SELECT * FROM BusStop WHERE stopName LIKE :query;")
     fun getBusStopsByQuery(query: String): Flowable<List<BusStop>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

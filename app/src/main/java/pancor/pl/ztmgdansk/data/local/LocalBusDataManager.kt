@@ -18,7 +18,7 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
     }
 
     override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
-        return busDao.getRoutesByQuery(query)
+        return busDao.getRoutesByQuery("%$query%")
                 .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
     }
 
@@ -32,7 +32,7 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
     }
 
     override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
-        return busDao.getBusStopsByQuery(query)
+        return busDao.getBusStopsByQuery("%$query%")
                 .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
     }
 

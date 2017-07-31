@@ -8,6 +8,13 @@ import javax.inject.Singleton
 
 @Singleton
 class FakeRemoteBusDataManager : BusDataContract {
+    override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun getBusRoutes(): Flowable<List<Route>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
