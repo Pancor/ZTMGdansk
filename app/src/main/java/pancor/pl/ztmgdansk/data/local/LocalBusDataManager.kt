@@ -17,6 +17,10 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
                 .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
     }
 
+    override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun insertBusRoutes(busRoutes: List<Route>) {
         busDao.insertOrReplaceRoutes(busRoutes)
     }
@@ -24,6 +28,10 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
     override fun getBusStops(): Flowable<List<BusStop>> {
         return busDao.getAllBusStops()
                 .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+    }
+
+    override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun insertBusStops(busStops: List<BusStop>) {

@@ -10,4 +10,8 @@ interface BusDataContract {
     fun getBusRoutes(): Flowable<List<Route>>
 
     fun getBusStops(): Flowable<List<BusStop>>
+
+    fun getBusStopsByQuery(query: String): Flowable<List<BusStop>>
+
+    fun getBusRoutesByQuery(query: String): Flowable<List<Route>>
 }

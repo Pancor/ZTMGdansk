@@ -28,4 +28,12 @@ class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataCo
                 .elementAt(0)
                 .toFlowable()
     }
+
+    override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
