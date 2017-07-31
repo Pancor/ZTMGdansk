@@ -1,6 +1,7 @@
 package pancor.pl.ztmgdansk.data
 
 import io.reactivex.Flowable
+import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.data.local.LocalBusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
@@ -30,10 +31,26 @@ class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataCo
     }
 
     override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val networkWithSave: Flowable<List<BusStop>> = remoteBusDataManager.getBusStopsByQuery(query)
+                .doOnNext { localBusDataManager.insertBusStops(it) }
+                .onErrorReturn { listOf() }
+        return Flowable.zip(localBusDataManager.getBusStopsByQuery(query),
+                            networkWithSave,
+                            BiFunction { local, remote -> mergeTwoListsWithoutDuplicates(local, remote) })
     }
 
     override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val networkWithSave: Flowable<List<Route>> = remoteBusDataManager.getBusRoutesByQuery(query)
+                .doOnNext { localBusDataManager.insertBusRoutes(it) }
+                .onErrorReturn { listOf() }
+        return Flowable.zip(localBusDataManager.getBusRoutesByQuery(query),
+                            networkWithSave,
+                            BiFunction { local, remote -> mergeTwoListsWithoutDuplicates(local, remote) })
+    }
+
+    private fun <T> mergeTwoListsWithoutDuplicates(list1: List<T>, list2: List<T>): List<T> {
+        val set = HashSet(list1)
+        set.addAll(list2)
+        return set.toList()
     }
 }
