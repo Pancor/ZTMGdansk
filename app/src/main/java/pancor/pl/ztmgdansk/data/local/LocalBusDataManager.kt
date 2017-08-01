@@ -11,15 +11,16 @@ import javax.inject.Singleton
 class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
 
     private val TIMEOUT_IN_SECONDS = 2L
+    private val TIME_UNIT = TimeUnit.SECONDS
 
     override fun getBusRoutes(): Flowable<List<Route>> {
         return busDao.getAllRoutes()
-                .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+                .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT)
     }
 
     override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
         return busDao.getRoutesByQuery("%$query%")
-                .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+                .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT)
     }
 
     override fun insertBusRoutes(busRoutes: List<Route>) {
@@ -28,12 +29,12 @@ class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
 
     override fun getBusStops(): Flowable<List<BusStop>> {
         return busDao.getAllBusStops()
-                .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+                .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT)
     }
 
     override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
         return busDao.getBusStopsByQuery("%$query%")
-                .timeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+                .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT)
     }
 
     override fun insertBusStops(busStops: List<BusStop>) {

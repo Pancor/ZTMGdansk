@@ -23,6 +23,7 @@ class LocalBusDataManagerTest {
 
     private val ROUTES = listOf(Route(1, "1", "Route1"), Route(2, "2", "Route2"))
     private val STOPS = listOf(BusStop(1, "Stop1"), BusStop(2, "Stop2"))
+    private val QUERY = "Query"
 
     private lateinit var localBusDataManager: LocalBusDataManager
     private lateinit var database: BusDatabase
@@ -44,6 +45,7 @@ class LocalBusDataManagerTest {
     @Test
     fun insertRoutesThenGetItBack() {
         localBusDataManager.insertBusRoutes(ROUTES)
+
         localBusDataManager.getBusRoutes().subscribe(testSubscriber)
 
         testSubscriber.awaitTerminalEvent()
@@ -53,6 +55,7 @@ class LocalBusDataManagerTest {
     @Test
     fun insertBusStopsThenGetItBack() {
         localBusDataManager.insertBusStops(STOPS)
+
         localBusDataManager.getBusStops().subscribe(testSubscriber)
 
         testSubscriber.awaitTerminalEvent()
@@ -63,6 +66,7 @@ class LocalBusDataManagerTest {
     fun insertTwoTimesTheSameBusStops() {
         localBusDataManager.insertBusStops(STOPS)
         localBusDataManager.insertBusStops(STOPS)
+
         localBusDataManager.getBusStops().subscribe(testSubscriber)
 
         testSubscriber.awaitTerminalEvent()
@@ -73,9 +77,46 @@ class LocalBusDataManagerTest {
     fun insertTwoTimesTheSameRoutes() {
         localBusDataManager.insertBusRoutes(ROUTES)
         localBusDataManager.insertBusRoutes(ROUTES)
+
         localBusDataManager.getBusRoutes().subscribe(testSubscriber)
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(ROUTES)
     }
+
+    @Test
+    fun checkIfPercentageCharactersAreAddedToStopsQuery() {
+        localBusDataManager.insertBusStops(STOPS)
+        val stop_query = "top"
+
+        localBusDataManager.getBusStopsByQuery(stop_query).subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(STOPS)
+    }
+
+    @Test
+    fun checkIfPercentageCharactersAreAddedToRoutesQuery() {
+        localBusDataManager.insertBusRoutes(ROUTES)
+        val routeQuery = "oute"
+
+        localBusDataManager.getBusRoutesByQuery(routeQuery).subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(ROUTES)
+    }
+
+    @Test
+    fun getRouteByShortNameByQuery() {
+        localBusDataManager.insertBusRoutes(ROUTES)
+        val query = "1"
+        val expectedResult = listOf(Route(1, "1", "Route1"))
+
+        localBusDataManager.getBusRoutesByQuery(query).subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(expectedResult)
+    }
+
+
 }
