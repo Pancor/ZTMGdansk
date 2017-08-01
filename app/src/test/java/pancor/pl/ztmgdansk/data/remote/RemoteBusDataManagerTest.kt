@@ -14,8 +14,9 @@ import pancor.pl.ztmgdansk.models.BusStop
 
 class RemoteBusDataManagerTest {
 
-    val ROUTE = Route(1, "1", "Route1")
-    val STOP = BusStop(1, "Stop1")
+    private val ROUTE = Route(1, "1", "Route1")
+    private val STOP = BusStop(1, "Stop1")
+    private val QUERY = "query123"
 
     @Mock
     private lateinit var netService: NetService
@@ -74,5 +75,49 @@ class RemoteBusDataManagerTest {
         remoteBusDataManager.getBusRoutes().subscribe(testSubscriber)
 
         testSubscriber.assertValue(listOf(ROUTE))
+    }
+
+    @Test
+    fun getRouteByQueryWhenNoError() {
+        val serverResponse = ServerResponse(isError = false, responseCode = 1,
+                response = listOf(ROUTE))
+        `when`(netService.getBusRoutesByQuery(QUERY)).thenReturn(Single.just(serverResponse))
+
+        remoteBusDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
+
+        testSubscriber.assertValue(listOf(ROUTE))
+    }
+
+    @Test
+    fun getRouteByQueryWhenIsError() {
+        val serverResponse = ServerResponse(isError = true, responseCode = 1,
+                response = listOf(ROUTE))
+        `when`(netService.getBusRoutesByQuery(QUERY)).thenReturn(Single.just(serverResponse))
+
+        remoteBusDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
+
+        testSubscriber.assertError(Exception::class.java)
+    }
+
+    @Test
+    fun getStopByQueryWhenNoError() {
+        val serverResponse = ServerResponse(isError = false, responseCode = 1,
+                response = listOf(STOP))
+        `when`(netService.getBusStopsByQuery(QUERY)).thenReturn(Single.just(serverResponse))
+
+        remoteBusDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
+
+        testSubscriber.assertValue(listOf(STOP))
+    }
+
+    @Test
+    fun getStopByQueryWhenIsError() {
+        val serverResponse = ServerResponse(isError = true, responseCode = 1,
+                response = listOf(STOP))
+        `when`(netService.getBusStopsByQuery(QUERY)).thenReturn(Single.just(serverResponse))
+
+        remoteBusDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
+
+        testSubscriber.assertError(Exception::class.java)
     }
 }
