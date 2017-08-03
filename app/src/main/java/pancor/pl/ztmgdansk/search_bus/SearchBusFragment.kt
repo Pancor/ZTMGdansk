@@ -2,10 +2,13 @@ package pancor.pl.ztmgdansk.search_bus
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import pancor.pl.ztmgdansk.R
+import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Route
 
 class SearchBusFragment : Fragment(), SearchBusContract.View {
 
@@ -18,6 +21,10 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
 
     override fun setPresenter(presenter: SearchBusContract.Presenter) {
         this.presenter = presenter
+    }
+
+    override fun onSearchResult(routes: List<Route>, stops: List<BusStop>) {
+        Log.e("TAGG", "Count: " + routes.size + " " + stops.size)
     }
 
     override fun showLoadingIndicator() {
