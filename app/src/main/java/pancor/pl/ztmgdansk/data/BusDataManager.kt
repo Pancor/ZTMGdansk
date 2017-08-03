@@ -1,7 +1,6 @@
 package pancor.pl.ztmgdansk.data
 
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.data.local.LocalBusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
@@ -31,26 +30,26 @@ class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataCo
     }
 
     override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
-        val networkWithSave: Flowable<List<BusStop>> = remoteBusDataManager.getBusStopsByQuery(query)
+        val networkSourceWithSave: Flowable<List<BusStop>> = remoteBusDataManager
+                .getBusStopsByQuery(query)
                 .doOnNext { localBusDataManager.insertBusStops(it) }
                 .onErrorReturn { listOf() }
-        return Flowable.zip(localBusDataManager.getBusStopsByQuery(query),
-                            networkWithSave,
-                            BiFunction { local, remote -> mergeTwoListsWithoutDuplicates(local, remote) })
+        val localSource: Flowable<List<BusStop>> = localBusDataManager
+                .getBusStopsByQuery(query)
+                .onErrorReturn { listOf() }
+        return localSource.mergeWith(networkSourceWithSave)
+                .distinct()
     }
 
     override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
-        val networkWithSave: Flowable<List<Route>> = remoteBusDataManager.getBusRoutesByQuery(query)
+        val networkSourceWithSave: Flowable<List<Route>> = remoteBusDataManager
+                .getBusRoutesByQuery(query)
                 .doOnNext { localBusDataManager.insertBusRoutes(it) }
                 .onErrorReturn { listOf() }
-        return Flowable.zip(localBusDataManager.getBusRoutesByQuery(query),
-                            networkWithSave,
-                            BiFunction { local, remote -> mergeTwoListsWithoutDuplicates(local, remote) })
-    }
-
-    private fun <T> mergeTwoListsWithoutDuplicates(list1: List<T>, list2: List<T>): List<T> {
-        val set = HashSet(list1)
-        set.addAll(list2)
-        return set.toList()
+        val localSource: Flowable<List<Route>> = localBusDataManager
+                .getBusRoutesByQuery(query)
+                .onErrorReturn { listOf() }
+        return localSource.mergeWith(networkSourceWithSave)
+                .distinct()
     }
 }
