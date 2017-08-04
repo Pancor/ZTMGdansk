@@ -23,6 +23,11 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
         setupSearchView()
     }
 
+    override fun onPause() {
+        super.onPause()
+        presenter.onStop()
+    }
+
     override fun onBackNavigationClickListener() {
         onBackPressed()
     }

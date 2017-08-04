@@ -25,7 +25,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets { main { java.srcDirs = ['src/main/java', 'src/mock/java'] } }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/mock/java']
+            resources.srcDirs = ['src/main/resources', 'src/test/resources']
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 ext {

@@ -15,6 +15,8 @@ interface SearchBusContract {
 
     interface Presenter {
 
+        fun onStop()
+
         fun setupSearchViewObservable(observable: Observable<String>)
     }
 }

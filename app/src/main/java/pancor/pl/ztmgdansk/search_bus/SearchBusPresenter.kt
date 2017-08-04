@@ -14,18 +14,22 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ActivityScope
-class SearchBusPresenter @Inject constructor(val view: SearchBusContract.View,
-                                             val busDataManager: BusDataManager): SearchBusContract.Presenter{
+class SearchBusPresenter @Inject constructor(private val view: SearchBusContract.View,
+                                             private val busDataManager: BusDataManager): SearchBusContract.Presenter {
 
-    val disposable = CompositeDisposable()
+    private val disposable = CompositeDisposable()
 
-    @Inject fun setupListeners() {
+    init {
         view.setPresenter(this)
+    }
+
+    override fun onStop() {
+        disposable.dispose()
     }
 
     override fun setupSearchViewObservable(observable: Observable<String>) {
         observable
-                .debounce(300, TimeUnit.MILLISECONDS)
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .filter { query -> query.length > 1 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
