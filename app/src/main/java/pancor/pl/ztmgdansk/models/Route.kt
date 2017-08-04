@@ -2,8 +2,9 @@ package pancor.pl.ztmgdansk.models
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity
-data class Route(@PrimaryKey val routeId: Int,
-                 val routeShortName: String,
-                 val routeLongName: String)
+data class Route(@SerializedName("routeId") @PrimaryKey val routeId: Int,
+                 @SerializedName("routeShortName") val routeShortName: String,
+                 @SerializedName("routeLongName") val routeLongName: String)
