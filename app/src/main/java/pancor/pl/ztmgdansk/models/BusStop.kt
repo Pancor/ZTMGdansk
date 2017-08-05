@@ -1,6 +1,7 @@
 package pancor.pl.ztmgdansk.models
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
@@ -22,7 +23,7 @@ data class BusStop(@SerializedName("stopId") @PrimaryKey val stopId: Int,
                    @SerializedName("activationDate") val activationDate: String?){
 
     //TODO change it!
-    constructor(stopId: Int,
-                stopName: String) : this(stopId, stopName, null, null, null, null, null,
+    @Ignore constructor(stopId: Int,
+                        stopName: String) : this(stopId, stopName, null, null, null, null, null,
                                          null, null, null, null, null, null, null, null)
 }
