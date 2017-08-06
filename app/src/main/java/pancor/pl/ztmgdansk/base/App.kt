@@ -7,6 +7,7 @@ import pancor.pl.ztmgdansk.data.BusDataModule
 import pancor.pl.ztmgdansk.data.DaggerBusDataComponent
 import pancor.pl.ztmgdansk.data.local.database.BusDatabase
 import pancor.pl.ztmgdansk.data.remote.net.NetModule
+import pancor.pl.ztmgdansk.tools.schedulers.SchedulerModule
 
 class App : Application() {
 
@@ -26,6 +27,7 @@ class App : Application() {
                 .busDao(db.getBusDao())
                 .busDataModule(BusDataModule())
                 .netModule(NetModule())
+                .schedulerModule(SchedulerModule())
                 .build()
     }
 }

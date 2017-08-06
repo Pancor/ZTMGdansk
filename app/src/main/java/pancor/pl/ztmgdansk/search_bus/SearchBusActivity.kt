@@ -9,6 +9,7 @@ import pancor.pl.ztmgdansk.R.layout.act_search_bus
 import pancor.pl.ztmgdansk.base.App
 import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.CustomSearchView.OnBackNavigationClickListener
+import pancor.pl.ztmgdansk.tools.schedulers.SchedulerModule
 import javax.inject.Inject
 
 class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {

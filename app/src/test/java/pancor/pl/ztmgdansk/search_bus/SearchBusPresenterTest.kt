@@ -19,6 +19,8 @@ import org.mockito.Mockito.`when`
 import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
+import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
+import pancor.pl.ztmgdansk.tools.schedulers.TrampolineSchedulerProvider
 
 class SearchBusPresenterTest {
 
@@ -32,24 +34,19 @@ class SearchBusPresenterTest {
     private lateinit var view: SearchBusContract.View
     @Mock
     private lateinit var dataManager: BusDataContract
-
-    companion object {
-        @BeforeClass @JvmStatic
-        fun setupFakeScheduler() {
-            RxAndroidPlugins.setInitMainThreadSchedulerHandler { _ -> Schedulers.trampoline() }
-        }
-    }
+    @Mock
+    private lateinit var schedulers: TrampolineSchedulerProvider
 
     @Before
     fun setupSearchBusPresenter() {
         MockitoAnnotations.initMocks(this)
         testSubscriber = TestSubscriber()
-        presenter = SearchBusPresenter(view, dataManager)
+        presenter = SearchBusPresenter(view, dataManager, schedulers)
     }
 
     @Test
     fun attachePresenterToTheView() {
-        presenter = SearchBusPresenter(view, dataManager)
+        presenter = SearchBusPresenter(view, dataManager, schedulers)
 
         verify(view).setPresenter(presenter)
     }
