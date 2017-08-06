@@ -2,20 +2,15 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
+import org.junit.After
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.times
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import pancor.pl.ztmgdansk.data.BusDataManager
 import java.util.concurrent.TimeUnit
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
@@ -30,24 +25,27 @@ class SearchBusPresenterTest {
 
     private lateinit var testSubscriber: TestSubscriber<Any>
     private lateinit var presenter: SearchBusPresenter
+    private lateinit var schedulers: BaseSchedulerProvider
     @Mock
     private lateinit var view: SearchBusContract.View
     @Mock
     private lateinit var dataManager: BusDataContract
-    @Mock
-    private lateinit var schedulers: TrampolineSchedulerProvider
 
     @Before
     fun setupSearchBusPresenter() {
         MockitoAnnotations.initMocks(this)
+        schedulers = TrampolineSchedulerProvider()
         testSubscriber = TestSubscriber()
         presenter = SearchBusPresenter(view, dataManager, schedulers)
     }
 
+    @After
+    fun cleanUp() {
+        presenter.onStop()
+    }
+
     @Test
     fun attachePresenterToTheView() {
-        presenter = SearchBusPresenter(view, dataManager, schedulers)
-
         verify(view).setPresenter(presenter)
     }
 
@@ -61,18 +59,23 @@ class SearchBusPresenterTest {
         verify(view).onSearchResult(ROUTES, STOPS)
     }
 
-    /*@Test
-    fun checkIfSearchStartsAfter500msOfWait() {
-        val emmitQuery = Observable.zip(
-                Observable.interval(400, TimeUnit.MILLISECONDS),
-                Observable.just("10", "100"),
-                BiFunction<Long, String, String> { t1, t2 -> t2 }
-        )
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.empty())
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.empty())
+    @Test
+    fun checkIfSearchWillCallDataSourcesOnlyOneTime() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
 
-        presenter.setupSearchViewObservable(emmitQuery)
+        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
 
-        verify(view, times(1)).onSearchResult(listOf(), listOf())
-    }*/
+        verify(view, times(1)).onSearchResult(ROUTES, STOPS)
+    }
+
+    @Test
+    fun ignoreQueryIfLengthIsLessThanTwo() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+
+        presenter.setupSearchViewObservable(Observable.just("1"))
+
+        verify(view, never()).onSearchResult(ROUTES, STOPS)
+    }
 }
