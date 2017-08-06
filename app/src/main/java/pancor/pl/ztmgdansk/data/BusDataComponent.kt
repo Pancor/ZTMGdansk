@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(BusDataModule::class, NetModule::class))
 interface BusDataComponent {
 
-    fun getBusDataManager() : BusDataManager
+    fun getBusDataManager() : BusDataContract
 
     @Component.Builder
     interface Builder {

@@ -7,6 +7,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import pancor.pl.ztmgdansk.base.ActivityScope
+import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @ActivityScope
 class SearchBusPresenter @Inject constructor(private val view: SearchBusContract.View,
-                                             private val busDataManager: BusDataManager): SearchBusContract.Presenter {
+                                             private val busDataManager: BusDataContract): SearchBusContract.Presenter {
 
     private val disposable = CompositeDisposable()
 

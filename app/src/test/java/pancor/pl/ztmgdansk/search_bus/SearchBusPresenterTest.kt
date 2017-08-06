@@ -2,9 +2,12 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.functions.BiFunction
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.times
@@ -13,21 +16,29 @@ import pancor.pl.ztmgdansk.data.BusDataManager
 import java.util.concurrent.TimeUnit
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
 
 class SearchBusPresenterTest {
 
     private val ROUTES = listOf(Route(10, "10", "Route10"))
-    private val STOPS = listOf(BusStop(20, "Stop20"))
-    private val QUERY = "query"
+    private val STOPS = listOf(BusStop(10, "Stop10"))
+    private val QUERY = "10"
 
     private lateinit var testSubscriber: TestSubscriber<Any>
     private lateinit var presenter: SearchBusPresenter
     @Mock
     private lateinit var view: SearchBusContract.View
     @Mock
-    private lateinit var dataManager: BusDataManager
+    private lateinit var dataManager: BusDataContract
+
+    companion object {
+        @BeforeClass @JvmStatic
+        fun setupFakeScheduler() {
+            RxAndroidPlugins.setInitMainThreadSchedulerHandler { _ -> Schedulers.trampoline() }
+        }
+    }
 
     @Before
     fun setupSearchBusPresenter() {
@@ -48,9 +59,9 @@ class SearchBusPresenterTest {
         `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
         `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
 
-        presenter.setupSearchViewObservable(Observable.just("10"))
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
 
-        verify(view).onSearchResult(listOf(), listOf())
+        verify(view).onSearchResult(ROUTES, STOPS)
     }
 
     /*@Test
