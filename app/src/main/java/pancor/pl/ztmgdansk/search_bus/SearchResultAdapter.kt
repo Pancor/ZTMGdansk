@@ -1,40 +1,81 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import pancor.pl.ztmgdansk.models.BusStop
-import pancor.pl.ztmgdansk.models.Route
+import kotlinx.android.synthetic.main.holder_main_screen.view.*
+import pancor.pl.ztmgdansk.R
+import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
+import pancor.pl.ztmgdansk.models.*
 
-
-class SearchResultAdapter(val routes: List<Route>,
-                          val stops: List<BusStop>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SearchResultAdapter(val searchResultData: ArrayList<SearchResultData>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val inflater = LayoutInflater.from(parent?.context)
+        when (viewType) {
+            HEADER_VIEW_TYPE -> {
+                val headerView = inflater.inflate(R.layout.holder_header, parent, false)
+                return HeaderHolder(headerView)
+            }
+            ROUTE_VIEW_TYPE -> {
+                val routeView = inflater.inflate(R.layout.holder_route, parent, false)
+                return RouteHolder(routeView)
+            }
+            BUS_STOP_VIEW_TYPE -> {
+                val busStopView = inflater.inflate(R.layout.holder_bus_stop, parent, false)
+                return BusStopHolder(busStopView)
+            }
+            else -> throw IllegalArgumentException("viewType returned unexpected type: $viewType")
+        }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        when (getItemViewType(position)) {
+            HEADER_VIEW_TYPE -> {
+                val headerHolder = holder as HeaderHolder
+                headerHolder.bindView(position)
+            }
+            ROUTE_VIEW_TYPE -> {
+                val routeHolder = holder as RouteHolder
+                routeHolder.bindView(position)
+            }
+            BUS_STOP_VIEW_TYPE -> {
+                val busStopHolder = holder as BusStopHolder
+                busStopHolder.bindView(position)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return searchResultData.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
+        return searchResultData[position].viewType
     }
 
     inner class HeaderHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
+        fun bindView(position: Int) {
+            val header = searchResultData[position].model as Header
+            itemView.title.text = header.title
+        }
     }
 
     inner class RouteHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
+        fun bindView(position: Int) {
+
+        }
     }
 
     inner class BusStopHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
+        fun bindView(position: Int) {
+
+        }
     }
 }
