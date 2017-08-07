@@ -78,4 +78,24 @@ class SearchBusPresenterTest {
 
         verify(view, never()).onSearchResult(ROUTES, STOPS)
     }
+
+    @Test
+    fun showLoadingIndicatorWhenUserIsWriting() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
+
+        verify(view).showLoadingIndicator()
+    }
+
+    @Test
+    fun hideLoadingIndicatorWhenResultFromQueryShowsUp() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
+
+        verify(view).hideLoadingIndicator()
+    }
 }

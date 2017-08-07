@@ -34,18 +34,20 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
         observable
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .filter { query -> query.length > 1 }
-                .observeOn(schedulers.ui())
                 .subscribeOn(schedulers.io())
-                .subscribe { handleResultFromSearch(it) }
+                .observeOn(schedulers.ui())
+                .subscribe { view.showLoadingIndicator()
+                             handleResultFromSearch(it) }
     }
 
     private fun handleResultFromSearch(query: String) {
         disposable.add(Flowable.zip(busDataManager.getBusRoutesByQuery(query),
                      busDataManager.getBusStopsByQuery(query),
-                     BiFunction<List<Route>, List<BusStop>, Unit> {
-                         routes, stops -> view.onSearchResult(routes, stops) })
+                     BiFunction<List<Route>, List<BusStop>, Pair<List<Route>, List<BusStop>>> {
+                         routes, stops ->  Pair(routes, stops)})
                      .subscribeOn(schedulers.io())
                      .observeOn(schedulers.ui())
-                     .subscribe())
+                     .subscribe { (first, second) -> view.onSearchResult(first, second)
+                                                     view.hideLoadingIndicator()})
     }
 }

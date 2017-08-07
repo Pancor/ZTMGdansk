@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.fr_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
@@ -28,10 +29,12 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     }
 
     override fun showLoadingIndicator() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        progressBar.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
     }
 
     override fun hideLoadingIndicator() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        progressBar.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
     }
 }
