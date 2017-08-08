@@ -35,7 +35,7 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
         this.presenter = presenter
     }
 
-    override fun onSearchResult(searchResultData: ArrayList<SearchResultData>) {
+    override fun onSearchResult(searchResultData: List<SearchResultData>) {
         recyclerView.adapter = SearchResultAdapter(searchResultData, resources)
 
     }

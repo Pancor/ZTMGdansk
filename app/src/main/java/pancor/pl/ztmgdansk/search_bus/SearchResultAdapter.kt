@@ -16,7 +16,7 @@ import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.*
 
-class SearchResultAdapter(val searchResultData: ArrayList<SearchResultData>,
+class SearchResultAdapter(val searchResultData: List<SearchResultData>,
                           val resources: Resources) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
