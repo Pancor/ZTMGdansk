@@ -8,7 +8,7 @@ interface SearchBusContract {
 
     interface View : BaseView<Presenter> {
 
-        fun onSearchResult(searchResultData: ArrayList<SearchResultData>)
+        fun onSearchResult(searchResultData: List<SearchResultData>)
     }
 
     interface Presenter {
