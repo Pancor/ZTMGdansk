@@ -1,4 +1,4 @@
 package pancor.pl.ztmgdansk.models
 
-data class Header(val title: String)
+data class Header(val title: Int)
 

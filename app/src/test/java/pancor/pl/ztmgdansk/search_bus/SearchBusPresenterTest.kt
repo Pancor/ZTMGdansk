@@ -56,7 +56,7 @@ class SearchBusPresenterTest {
 
         presenter.setupSearchViewObservable(Observable.just(QUERY))
 
-        verify(view).onSearchResult(ROUTES, STOPS)
+        verify(view).onSearchResult(arrayListOf())
     }
 
     @Test
@@ -66,7 +66,7 @@ class SearchBusPresenterTest {
 
         presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
 
-        verify(view, times(1)).onSearchResult(ROUTES, STOPS)
+        verify(view, times(1)).onSearchResult(arrayListOf())
     }
 
     @Test
@@ -76,7 +76,7 @@ class SearchBusPresenterTest {
 
         presenter.setupSearchViewObservable(Observable.just("1"))
 
-        verify(view, never()).onSearchResult(ROUTES, STOPS)
+        verify(view, never()).onSearchResult(arrayListOf())
     }
 
     @Test

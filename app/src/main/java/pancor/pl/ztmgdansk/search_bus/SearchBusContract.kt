@@ -2,15 +2,13 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Observable
 import pancor.pl.ztmgdansk.base.BaseView
-import pancor.pl.ztmgdansk.models.BusStop
-import pancor.pl.ztmgdansk.models.Route
-
+import pancor.pl.ztmgdansk.models.SearchResultData
 
 interface SearchBusContract {
 
     interface View : BaseView<Presenter> {
 
-        fun onSearchResult(routes: List<Route>, stops: List<BusStop>)
+        fun onSearchResult(searchResultData: ArrayList<SearchResultData>)
     }
 
     interface Presenter {
