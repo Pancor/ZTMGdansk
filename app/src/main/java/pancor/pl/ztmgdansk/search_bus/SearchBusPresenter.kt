@@ -50,29 +50,22 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
                      BiFunction<List<Route>, List<BusStop>, Pair<List<Route>, List<BusStop>>> {
                          routes, stops ->  Pair(routes, stops)})
                 .subscribeOn(schedulers.io())
-                .observeOn(schedulers.io())
-                .subscribe { (routes, stops) -> mergeRoutesWithStopsAndAddHeaders(routes, stops) }
+                .observeOn(schedulers.ui())
+                .subscribe { (routes, stops) -> view.onSearchResult(mergeRoutesWithStopsAndAddHeaders(routes, stops))
+                                                view.hideLoadingIndicator()}
     }
 
-    private fun mergeRoutesWithStopsAndAddHeaders(routes: List<Route>, stops: List<BusStop>) {
-        val routesFlowable = Flowable.just(routes)
-                .filter { list -> list.isNotEmpty() }
-                .flatMapIterable { list -> list }
-                .map { route -> SearchResultData(route, ROUTE_VIEW_TYPE) }
-                .startWith(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE))
-                .toList()
-
-        val stopsFlowable = Flowable.just(stops)
-                .filter { list -> list.isNotEmpty() }
-                .flatMapIterable { list -> list }
-                .map { stop -> SearchResultData(stop, BUS_STOP_VIEW_TYPE) }
-                .startWith(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE))
-                .toList()
-
-        routesFlowable.concatWith(stopsFlowable)
-                .subscribeOn(schedulers.io())
-                .observeOn(schedulers.ui())
-                .subscribe { searchDataResult -> view.hideLoadingIndicator()
-                                                 view.onSearchResult(searchDataResult)}
+    private fun mergeRoutesWithStopsAndAddHeaders(routes: List<Route>, stops: List<BusStop>):
+            ArrayList<SearchResultData> {
+        val searchResultData = arrayListOf<SearchResultData>()
+        if (routes.isNotEmpty()) {
+            searchResultData.add(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE))
+            routes.mapTo(searchResultData) { SearchResultData(it, ROUTE_VIEW_TYPE) }
+        }
+        if (stops.isNotEmpty()) {
+            searchResultData.add(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE))
+            stops.mapTo(searchResultData) { SearchResultData(it, BUS_STOP_VIEW_TYPE) }
+        }
+        return searchResultData
     }
 }
