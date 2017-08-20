@@ -75,7 +75,8 @@ class SearchResultAdapter(val searchResultData: List<SearchResultData>,
 
         fun bindView(position: Int) {
             val route = searchResultData[position].model as Route
-            itemView.routeName.text = route.routeLongName
+            itemView.routeShortName.text = route.routeShortName
+            itemView.busType.text = "Autobus"
         }
     }
 

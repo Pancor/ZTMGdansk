@@ -2,6 +2,7 @@ package pancor.pl.ztmgdansk.search_bus
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -10,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fr_search_bus.*
 import pancor.pl.ztmgdansk.R
+import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.SearchResultData
+import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 
 class SearchBusFragment : Fragment(), SearchBusContract.View {
 
@@ -27,8 +30,21 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     }
 
     private fun setupRecyclerView() {
-        val grid = GridLayoutManager(context, 1)
+        val grid = GridLayoutManager(context, 4)
+        grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+
+                if (recyclerView.adapter.getItemViewType(position) == HEADER_VIEW_TYPE) {
+                    return 4
+                } else {
+                    return 1
+                }
+            }
+        }
         recyclerView.layoutManager = grid
+
+        val itemDecoration = SearchResultItemDecoration()
+        recyclerView.addItemDecoration(itemDecoration)
     }
 
     override fun setPresenter(presenter: SearchBusContract.Presenter) {
