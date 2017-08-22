@@ -7,6 +7,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit
 import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
+import pancor.pl.ztmgdansk.models.SearchResultData
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import pancor.pl.ztmgdansk.tools.schedulers.TrampolineSchedulerProvider
 
@@ -23,7 +25,6 @@ class SearchBusPresenterTest {
     private val STOPS = listOf(BusStop(10, "Stop10"))
     private val QUERY = "10"
 
-    private lateinit var testSubscriber: TestSubscriber<Any>
     private lateinit var presenter: SearchBusPresenter
     private lateinit var schedulers: BaseSchedulerProvider
     @Mock
@@ -35,7 +36,6 @@ class SearchBusPresenterTest {
     fun setupSearchBusPresenter() {
         MockitoAnnotations.initMocks(this)
         schedulers = TrampolineSchedulerProvider()
-        testSubscriber = TestSubscriber()
         presenter = SearchBusPresenter(view, dataManager, schedulers)
     }
 
@@ -56,7 +56,7 @@ class SearchBusPresenterTest {
 
         presenter.setupSearchViewObservable(Observable.just(QUERY))
 
-        verify(view).onSearchResult(arrayListOf())
+        verify(view).onSearchResult(ArgumentMatchers.anyList())
     }
 
     @Test
@@ -66,7 +66,7 @@ class SearchBusPresenterTest {
 
         presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
 
-        verify(view, times(1)).onSearchResult(arrayListOf())
+        verify(view, times(1)).onSearchResult(ArgumentMatchers.anyList())
     }
 
     @Test
@@ -97,5 +97,15 @@ class SearchBusPresenterTest {
         presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
 
         verify(view).hideLoadingIndicator()
+    }
+
+    @Test
+    fun whenNoResultThenReturnEmptyList() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.empty())
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.empty())
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
+
+        verify(view).onSearchResult(listOf())
     }
 }
