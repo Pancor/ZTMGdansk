@@ -2,8 +2,6 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
-import io.reactivex.subscribers.TestSubscriber
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -11,9 +9,13 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import java.util.concurrent.TimeUnit
+import pancor.pl.ztmgdansk.R
+import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Header
 import pancor.pl.ztmgdansk.models.Route
 import pancor.pl.ztmgdansk.models.SearchResultData
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
@@ -101,11 +103,55 @@ class SearchBusPresenterTest {
 
     @Test
     fun whenNoResultThenReturnEmptyList() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.empty())
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.empty())
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
 
         presenter.setupSearchViewObservable(Observable.just(QUERY))
 
         verify(view).onSearchResult(listOf())
+    }
+
+    @Test
+    fun whenBusStopsListIsEmptyThenReturnOnlyRoutesList() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
+
+        verify(view).onSearchResult(ArgumentMatchers.anyList())
+    }
+
+    @Test
+    fun whenRoutesListIsEmptyThenReturnOnlyBusStopsList() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
+
+        verify(view).onSearchResult(ArgumentMatchers.anyList())
+    }
+
+    @Test
+    fun whenStopsListIsNotEmptyThenAddHeaderToResult() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        val expectedResult = listOf(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
+                                    SearchResultData(STOPS[0], BUS_STOP_VIEW_TYPE))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
+
+        verify(view).onSearchResult(expectedResult)
+    }
+
+    @Test
+    fun whenBusRoutesListIsNotEmptyThenAddHeaderToResult() {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        val expectedResult = listOf(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTES[0], ROUTE_VIEW_TYPE))
+
+        presenter.setupSearchViewObservable(Observable.just(QUERY))
+
+        verify(view).onSearchResult(expectedResult)
     }
 }
