@@ -18,6 +18,7 @@ import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 class SearchBusFragment : Fragment(), SearchBusContract.View {
 
     private lateinit var presenter: SearchBusContract.Presenter
+    private lateinit var searchResultInterface: SearchResult
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -45,6 +46,11 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
 
         val itemDecoration = SearchResultItemDecoration()
         recyclerView.addItemDecoration(itemDecoration)
+
+
+        val adapter = SearchResultAdapter(resources)
+        searchResultInterface = adapter
+        recyclerView.adapter = adapter
     }
 
     override fun setPresenter(presenter: SearchBusContract.Presenter) {
@@ -52,8 +58,7 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     }
 
     override fun onSearchResult(searchResultData: List<SearchResultData>) {
-        recyclerView.adapter = SearchResultAdapter(searchResultData, resources)
-
+        searchResultInterface.setData(searchResultData)
     }
 
     override fun showLoadingIndicator() {
@@ -64,5 +69,10 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     override fun hideLoadingIndicator() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
+    }
+
+    interface SearchResult {
+
+        fun setData(searchResultData: List<SearchResultData>)
     }
 }

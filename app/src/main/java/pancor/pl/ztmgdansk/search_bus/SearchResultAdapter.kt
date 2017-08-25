@@ -16,8 +16,10 @@ import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.*
 
-class SearchResultAdapter(val searchResultData: List<SearchResultData>,
-                          val resources: Resources) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SearchResultAdapter(val resources: Resources) : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
+        SearchBusFragment.SearchResult{
+
+    var searchResultData: List<SearchResultData> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
@@ -61,6 +63,10 @@ class SearchResultAdapter(val searchResultData: List<SearchResultData>,
 
     override fun getItemViewType(position: Int): Int {
         return searchResultData[position].viewType
+    }
+
+    override fun setData(searchResultData: List<SearchResultData>) {
+        this.searchResultData = searchResultData
     }
 
     inner class HeaderHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
