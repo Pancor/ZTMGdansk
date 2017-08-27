@@ -1,4 +1,4 @@
 package pancor.pl.ztmgdansk.models
 
-data class Header(val title: Int)
+data class Header(override val id: Int, val title: Int) : SearchResultData.Model()
 

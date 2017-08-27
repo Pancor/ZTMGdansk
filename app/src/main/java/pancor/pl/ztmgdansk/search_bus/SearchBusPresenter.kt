@@ -59,11 +59,11 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
             ArrayList<SearchResultData> {
         val searchResultData = arrayListOf<SearchResultData>()
         if (routes.isNotEmpty()) {
-            searchResultData.add(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE))
+            searchResultData.add(SearchResultData(Header(R.string.routes, R.string.routes), HEADER_VIEW_TYPE))
             routes.mapTo(searchResultData) { SearchResultData(it, ROUTE_VIEW_TYPE) }
         }
         if (stops.isNotEmpty()) {
-            searchResultData.add(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE))
+            searchResultData.add(SearchResultData(Header(R.string.bus_stops, R.string.bus_stops), HEADER_VIEW_TYPE))
             stops.mapTo(searchResultData) { SearchResultData(it, BUS_STOP_VIEW_TYPE) }
         }
         return searchResultData

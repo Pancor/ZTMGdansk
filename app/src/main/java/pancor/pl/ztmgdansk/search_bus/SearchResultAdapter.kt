@@ -1,11 +1,14 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import android.content.res.Resources
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.holder_bus_stop.view.*
 import kotlinx.android.synthetic.main.holder_header.view.*
 import kotlinx.android.synthetic.main.holder_main_screen.view.*
@@ -15,8 +18,9 @@ import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.*
+import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 
-class SearchResultAdapter(val resources: Resources) : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
+class SearchResultAdapter(val resources: Resources, val schedulers: BaseSchedulerProvider) : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
         SearchBusFragment.SearchResult{
 
     var searchResultData: List<SearchResultData> = listOf()
@@ -65,8 +69,13 @@ class SearchResultAdapter(val resources: Resources) : RecyclerView.Adapter<Recyc
         return searchResultData[position].viewType
     }
 
-    override fun setData(searchResultData: List<SearchResultData>) {
-        this.searchResultData = searchResultData
+    override fun setData(newSearchResultData: List<SearchResultData>): Disposable {
+        return Flowable.just(newSearchResultData)
+                .subscribeOn(schedulers.computation())
+                .map{ DiffUtil.calculateDiff(SearchResultDiff(searchResultData, it)) }
+                .observeOn(schedulers.ui())
+                .doOnNext { searchResultData = newSearchResultData }
+                .subscribe { it.dispatchUpdatesTo(this) }
     }
 
     inner class HeaderHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
