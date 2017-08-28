@@ -25,11 +25,6 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener, Cu
         setupSearchView()
     }
 
-    override fun onPause() {
-        super.onPause()
-        presenter.onStop()
-    }
-
     override fun getSearchViewTextChangeListener(): Flowable<String> =
             searchView.getTextChangeObservable().toFlowable(BackpressureStrategy.BUFFER)
 

@@ -24,14 +24,8 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
                                              private val busDataManager: BusDataContract,
                                              private val schedulers: BaseSchedulerProvider): SearchBusContract.Presenter {
 
-    private val disposable = CompositeDisposable()
-
     init {
         view.setPresenter(this)
-    }
-
-    override fun onStop() {
-        disposable.dispose()
     }
 
     override fun getSearchViewResult(searchViewObservable: Flowable<String>): Flowable<ArrayList<SearchResultData>> {

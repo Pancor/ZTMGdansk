@@ -14,8 +14,6 @@ interface SearchBusContract {
 
     interface Presenter {
 
-        fun onStop()
-
         fun getSearchViewResult(searchViewObservable: Flowable<String>): Flowable<ArrayList<SearchResultData>>
     }
 }
