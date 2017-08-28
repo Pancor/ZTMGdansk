@@ -19,6 +19,9 @@ android {
         versionName getVersionNameApp()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -39,7 +42,7 @@ android {
 ext {
     androidVersion = '25.3.1'
     glideVersion = '3.7.0'
-    daggerVersion = '2.9'
+    daggerVersion = '2.11-rc2'
     retrofitVersion = '2.2.0'
     rxJavaVersion = '2.0.1'
     rxKotlinVersion = '2.0.0'
@@ -68,6 +71,7 @@ dependencies {
     //dagger
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     compile "com.google.dagger:dagger:$daggerVersion"
+    compile "com.google.dagger:dagger-android-support:$daggerVersion"
 
     //retrofit
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
