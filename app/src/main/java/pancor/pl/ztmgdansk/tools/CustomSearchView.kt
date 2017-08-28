@@ -56,4 +56,8 @@ class CustomSearchView : Toolbar {
     interface OnBackNavigationClickListener {
         fun onBackNavigationClickListener()
     }
+
+    interface SearchViewTextChangeListener {
+        fun getSearchViewTextChangeListener(): Flowable<String>
+    }
 }

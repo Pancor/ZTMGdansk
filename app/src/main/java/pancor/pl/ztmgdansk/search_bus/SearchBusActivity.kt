@@ -2,17 +2,18 @@ package pancor.pl.ztmgdansk.search_bus
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
 import kotlinx.android.synthetic.main.act_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.act_search_bus
 import pancor.pl.ztmgdansk.base.App
+import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.CustomSearchView.OnBackNavigationClickListener
-import pancor.pl.ztmgdansk.tools.schedulers.SchedulerModule
 import javax.inject.Inject
 
-class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
+class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener, CustomSearchView.SearchViewTextChangeListener {
 
     @Inject lateinit var presenter: SearchBusPresenter
 
@@ -28,6 +29,9 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
         super.onPause()
         presenter.onStop()
     }
+
+    override fun getSearchViewTextChangeListener(): Flowable<String> =
+            searchView.getTextChangeObservable().toFlowable(BackpressureStrategy.BUFFER)
 
     override fun onBackNavigationClickListener() {
         onBackPressed()
@@ -53,6 +57,5 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener {
 
     private fun setupSearchView() {
         searchView.setBackNavigationListener(this)
-        presenter.setupSearchViewObservable(searchView.getTextChangeObservable())
     }
 }

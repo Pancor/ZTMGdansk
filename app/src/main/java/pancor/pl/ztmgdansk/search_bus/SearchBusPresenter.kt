@@ -34,25 +34,22 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
         disposable.dispose()
     }
 
-    override fun setupSearchViewObservable(observable: Observable<String>) {
-        disposable.add(observable
+    override fun getSearchViewResult(searchViewObservable: Flowable<String>): Flowable<ArrayList<SearchResultData>> {
+        return searchViewObservable
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .filter { query -> query.length > 1 }
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui())
-                .subscribe { view.showLoadingIndicator()
-                             handleResultFromSearch(it) })
-    }
-
-    private fun handleResultFromSearch(query: String) {
-        disposable.add(Flowable.zip(busDataManager.getBusRoutesByQuery(query),
-                     busDataManager.getBusStopsByQuery(query),
-                     BiFunction<List<Route>, List<BusStop>, Pair<List<Route>, List<BusStop>>> {
-                         routes, stops ->  Pair(routes, stops)})
-                .subscribeOn(schedulers.io())
+                .doOnNext { view.showLoadingIndicator() }
+                .observeOn(schedulers.io())
+                .flatMap { query ->
+                    Flowable.zip(busDataManager.getBusRoutesByQuery(query),
+                                 busDataManager.getBusStopsByQuery(query),
+                                 BiFunction<List<Route>, List<BusStop>, Pair<List<Route>, List<BusStop>>> {
+                                     routes, stops ->  Pair(routes, stops)}) }
+                .map { (routes, stops) -> mergeRoutesWithStopsAndAddHeaders(routes, stops) }
                 .observeOn(schedulers.ui())
-                .subscribe { (routes, stops) -> view.onSearchResult(mergeRoutesWithStopsAndAddHeaders(routes, stops))
-                                                view.hideLoadingIndicator()})
+                .doOnNext{ view.hideLoadingIndicator() }
     }
 
     private fun mergeRoutesWithStopsAndAddHeaders(routes: List<Route>, stops: List<BusStop>):

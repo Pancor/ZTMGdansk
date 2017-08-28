@@ -9,12 +9,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fr_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.SearchResultData
+import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 import pancor.pl.ztmgdansk.tools.schedulers.SchedulerProvider
 
@@ -32,6 +34,7 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupSearchViewListener()
     }
 
     private fun setupRecyclerView() {
@@ -66,8 +69,8 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
         this.presenter = presenter
     }
 
-    override fun onSearchResult(searchResultData: List<SearchResultData>) {
-        disposable.add(searchResultInterface.setData(searchResultData))
+    override fun onSearchResult(searchResultData: Flowable<List<SearchResultData>>) {
+        searchResultInterface.setData(searchResultData)
     }
 
     override fun showLoadingIndicator() {
@@ -80,8 +83,13 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
         recyclerView.visibility = View.VISIBLE
     }
 
+    private fun setupSearchViewListener() {
+        val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
+        searchViewTextChangeListener.getSearchViewTextChangeListener()
+    }
+
     interface SearchResult {
 
-        fun setData(newSearchResultData: List<SearchResultData>): Disposable
+        fun setData(newSearchResultData: Flowable<List<SearchResultData>>): Disposable
     }
 }
