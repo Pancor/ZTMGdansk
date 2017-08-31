@@ -15,16 +15,22 @@ import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
+import pancor.pl.ztmgdansk.di.ActivityScope
+import pancor.pl.ztmgdansk.di.FragmentScope
 import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
+import javax.inject.Inject
 
-class SearchResultAdapter(val resources: Resources, val schedulers: BaseSchedulerProvider) : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
-        SearchBusFragment.SearchResult{
+@ActivityScope
+class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvider) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>(), SearchBusFragment.SearchResult {
 
-    var searchResultData: List<SearchResultData> = listOf()
+    private lateinit var resources: Resources
+    private var searchResultData: List<SearchResultData> = listOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent?.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        resources = parent.context.resources
+        val inflater = LayoutInflater.from(parent.context)
         when (viewType) {
             HEADER_VIEW_TYPE -> {
                 val headerView = inflater.inflate(R.layout.holder_header, parent, false)
@@ -69,7 +75,7 @@ class SearchResultAdapter(val resources: Resources, val schedulers: BaseSchedule
 
     override fun setData(newSearchResultData: Flowable<ArrayList<SearchResultData>>): Disposable {
         return newSearchResultData
-                .subscribeOn(schedulers.computation())
+                .subscribeOn(schedulers.io())
                 .doOnNext { searchResultData = it }
                 .map{ DiffUtil.calculateDiff(SearchResultDiff(searchResultData, it)) }
                 .observeOn(schedulers.ui())

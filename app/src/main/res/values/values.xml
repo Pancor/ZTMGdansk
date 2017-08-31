@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- search_bus package -->
+    <integer name="searchResult_RecyclerColsCount">4</integer>
+    <integer name="searchResult_HeaderView">4</integer>
+    <integer name="searchResult_RouteView">1</integer>
+    <integer name="searchResult_BusStopView">2</integer>
+
+</resources>

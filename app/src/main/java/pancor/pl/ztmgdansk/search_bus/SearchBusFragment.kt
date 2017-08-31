@@ -1,31 +1,32 @@
 package pancor.pl.ztmgdansk.search_bus
 
-import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.DaggerFragment
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fr_search_bus.*
 import pancor.pl.ztmgdansk.R
+import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.BaseFragment
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.SearchResultData
 import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 import pancor.pl.ztmgdansk.tools.schedulers.SchedulerProvider
 import javax.inject.Inject
 
-class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContract.View {
+class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract.View {
 
     @Inject
     lateinit var presenter: SearchBusContract.Presenter
-    private val disposable = CompositeDisposable()
+    @Inject
+    lateinit var adapter: SearchResultAdapter
     private lateinit var searchResultInterface: SearchResult
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -41,15 +42,18 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
     }
 
     private fun setupRecyclerView() {
-        val grid = GridLayoutManager(context, 4)
+        val resources = context.resources
+        val recyclerColsCount = resources.getInteger(R.integer.searchResult_RecyclerColsCount)
+        val grid = GridLayoutManager(context, recyclerColsCount)
         grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-
-                if (recyclerView.adapter.getItemViewType(position) == HEADER_VIEW_TYPE) {
-                    return 4
-                } else {
-                    return 1
+                val integerViewType = when(recyclerView.adapter.getItemViewType(position)){
+                    HEADER_VIEW_TYPE -> R.integer.searchResult_HeaderView
+                    ROUTE_VIEW_TYPE -> R.integer.searchResult_RouteView
+                    BUS_STOP_VIEW_TYPE -> R.integer.searchResult_BusStopView
+                    else -> throw IllegalArgumentException("Returned unknown view type")
                 }
+                return resources.getInteger(integerViewType)
             }
         }
         recyclerView.layoutManager = grid
@@ -57,19 +61,8 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
         val itemDecoration = SearchResultItemDecoration()
         recyclerView.addItemDecoration(itemDecoration)
 
-        //TODO make it inject scheduler provider and resources
-        val adapter = SearchResultAdapter(resources, SchedulerProvider())
         searchResultInterface = adapter
         recyclerView.adapter = adapter
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.dispose()
-    }
-
-    override fun onSearchResult(searchResultData: Flowable<List<SearchResultData>>) {
-
     }
 
     override fun showLoadingIndicator() {
@@ -84,7 +77,10 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
 
     private fun setupSearchViewListener() {
         val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
-        searchResultInterface.setData(presenter.getSearchViewResult(searchViewTextChangeListener.getSearchViewTextChangeListener()))
+        val queryFlowable = searchViewTextChangeListener.getSearchViewTextChangeListener()
+        val searchResultFlowable = presenter.getSearchViewResult(queryFlowable)
+        val searchResultDisposable = searchResultInterface.setData(searchResultFlowable)
+        disposable.add(searchResultDisposable)
     }
 
     interface SearchResult {

@@ -10,7 +10,7 @@ interface SearchBusContract {
 
     interface View : BaseView {
 
-        fun onSearchResult(searchResultData: Flowable<List<SearchResultData>>)
+
     }
 
     interface Presenter : BasePresenter<View> {
