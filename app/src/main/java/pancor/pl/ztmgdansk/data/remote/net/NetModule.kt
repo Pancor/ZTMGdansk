@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-abstract class NetModule {
+class NetModule {
 
     val BASE_URL = "http://panekpawel.pl/ztm/v1/"
 
