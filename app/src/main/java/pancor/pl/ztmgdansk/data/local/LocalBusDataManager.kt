@@ -5,10 +5,11 @@ import pancor.pl.ztmgdansk.data.local.database.BusDao
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocalBusDataManager(private val busDao: BusDao) : LocalBusDataContract {
+class LocalBusDataManager @Inject constructor(private val busDao: BusDao) : LocalBusDataContract {
 
     private val TIMEOUT_IN_SECONDS = 2L
     private val TIME_UNIT = TimeUnit.SECONDS

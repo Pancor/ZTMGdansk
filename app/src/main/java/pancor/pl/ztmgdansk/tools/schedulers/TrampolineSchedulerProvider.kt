@@ -2,9 +2,11 @@ package pancor.pl.ztmgdansk.tools.schedulers
 
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class TrampolineSchedulerProvider : BaseSchedulerProvider {
+@Singleton
+class TrampolineSchedulerProvider @Inject constructor() : BaseSchedulerProvider {
 
     override fun computation(): Scheduler {
         return Schedulers.trampoline()

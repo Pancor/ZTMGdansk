@@ -1,21 +1,31 @@
 package pancor.pl.ztmgdansk.search_bus
 
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import dagger.Lazy
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.DaggerAppCompatActivity
+import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import kotlinx.android.synthetic.main.act_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.act_search_bus
-import pancor.pl.ztmgdansk.base.App
 import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.CustomSearchView.OnBackNavigationClickListener
 import javax.inject.Inject
 
-class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener, CustomSearchView.SearchViewTextChangeListener {
+class SearchBusActivity : DaggerAppCompatActivity(), OnBackNavigationClickListener, CustomSearchView.SearchViewTextChangeListener {
 
-    @Inject lateinit var presenter: SearchBusPresenter
+    @Inject
+    lateinit var presenter: SearchBusPresenter
+    @Inject
+    lateinit var searchBusFragmentProvider: Lazy<SearchBusFragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,18 +46,10 @@ class SearchBusActivity : AppCompatActivity(), OnBackNavigationClickListener, Cu
         var searchBusFragment: SearchBusFragment? = supportFragmentManager
                 .findFragmentById(R.id.container) as SearchBusFragment?
         if (searchBusFragment == null){
-            searchBusFragment = SearchBusFragment()
+            searchBusFragment = searchBusFragmentProvider.get()
             OtherUtils().addFragmentToActivity(supportFragmentManager,
                     searchBusFragment, R.id.container)
         }
-        setupInjection(searchBusFragment)
-    }
-
-    private fun setupInjection(view: SearchBusFragment) {
-        DaggerSearchBusComponent.builder()
-                .dataManager((application as App).busDataComponentBuild)
-                .view(view)
-                .build().inject(this)
     }
 
     private fun setupSearchView() {

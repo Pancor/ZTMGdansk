@@ -1,16 +1,14 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.R
-import pancor.pl.ztmgdansk.base.ActivityScope
+import pancor.pl.ztmgdansk.di.ActivityScope
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.data.BusDataContract
+import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Header
 import pancor.pl.ztmgdansk.models.Route
@@ -20,13 +18,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ActivityScope
-class SearchBusPresenter @Inject constructor(private val view: SearchBusContract.View,
-                                             private val busDataManager: BusDataContract,
+class SearchBusPresenter @Inject constructor(private val busDataManager: BusDataContract,
                                              private val schedulers: BaseSchedulerProvider): SearchBusContract.Presenter {
 
-    init {
-        view.setPresenter(this)
-    }
+    private lateinit var view: SearchBusContract.View
 
     override fun getSearchViewResult(searchViewObservable: Flowable<String>): Flowable<ArrayList<SearchResultData>> {
         return searchViewObservable
@@ -58,5 +53,9 @@ class SearchBusPresenter @Inject constructor(private val view: SearchBusContract
             stops.mapTo(searchResultData) { SearchResultData(it, BUS_STOP_VIEW_TYPE) }
         }
         return searchResultData
+    }
+
+    override fun onSetView(view: SearchBusContract.View) {
+         this.view = view
     }
 }

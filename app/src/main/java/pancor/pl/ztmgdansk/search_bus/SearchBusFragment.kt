@@ -1,14 +1,14 @@
 package pancor.pl.ztmgdansk.search_bus
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import dagger.android.support.AndroidSupportInjection
+import dagger.android.support.DaggerFragment
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -19,11 +19,13 @@ import pancor.pl.ztmgdansk.models.SearchResultData
 import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 import pancor.pl.ztmgdansk.tools.schedulers.SchedulerProvider
+import javax.inject.Inject
 
-class SearchBusFragment : Fragment(), SearchBusContract.View {
+class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContract.View {
 
+    @Inject
+    lateinit var presenter: SearchBusContract.Presenter
     private val disposable = CompositeDisposable()
-    private lateinit var presenter: SearchBusContract.Presenter
     private lateinit var searchResultInterface: SearchResult
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -63,10 +65,6 @@ class SearchBusFragment : Fragment(), SearchBusContract.View {
     override fun onDestroy() {
         super.onDestroy()
         disposable.dispose()
-    }
-
-    override fun setPresenter(presenter: SearchBusContract.Presenter) {
-        this.presenter = presenter
     }
 
     override fun onSearchResult(searchResultData: Flowable<List<SearchResultData>>) {

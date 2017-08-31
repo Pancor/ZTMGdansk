@@ -1,15 +1,14 @@
 package pancor.pl.ztmgdansk.tools.schedulers
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class SchedulerModule {
+abstract class SchedulerModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideScheduler(): BaseSchedulerProvider {
-        return SchedulerProvider()
-    }
+    abstract fun provideScheduler(schedulerProvider: SchedulerProvider): BaseSchedulerProvider
 }

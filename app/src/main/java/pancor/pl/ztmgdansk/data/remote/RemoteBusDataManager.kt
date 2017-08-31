@@ -6,10 +6,11 @@ import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.data.remote.net.NetService
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RemoteBusDataManager(private val netService: NetService) : BusDataContract {
+class RemoteBusDataManager @Inject constructor(private val netService: NetService) : BusDataContract {
 
     override fun getBusRoutes(): Flowable<List<Route>> {
         return netService.getRoutes()

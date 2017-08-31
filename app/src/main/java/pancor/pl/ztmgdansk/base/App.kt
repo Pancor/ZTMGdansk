@@ -1,33 +1,21 @@
 package pancor.pl.ztmgdansk.base
 
-import android.app.Application
 import android.arch.persistence.room.Room
-import pancor.pl.ztmgdansk.data.BusDataComponent
-import pancor.pl.ztmgdansk.data.BusDataModule
-import pancor.pl.ztmgdansk.data.DaggerBusDataComponent
+import dagger.android.AndroidInjector
+import dagger.android.support.DaggerApplication
+import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.data.local.database.BusDatabase
-import pancor.pl.ztmgdansk.data.remote.net.NetModule
-import pancor.pl.ztmgdansk.tools.schedulers.SchedulerModule
+import pancor.pl.ztmgdansk.di.DaggerAppComponent
+import javax.inject.Inject
 
-class App : Application() {
+class App : DaggerApplication() {
 
-    lateinit var busDataComponentBuild: BusDataComponent
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
 
-    override fun onCreate(){
-        super.onCreate()
-        busDataComponentBuild = getBusDataComponent()
-    }
-
-    private fun getBusDataComponent() : BusDataComponent {
-        val db = Room.databaseBuilder(applicationContext,
-                BusDatabase::class.java, "ztm_database").build()
-
-        return DaggerBusDataComponent.builder()
+        val appComponent = DaggerAppComponent.builder()
                 .app(this)
-                .busDao(db.getBusDao())
-                .busDataModule(BusDataModule())
-                .netModule(NetModule())
-                .schedulerModule(SchedulerModule())
                 .build()
+        appComponent.inject(this)
+        return appComponent
     }
 }

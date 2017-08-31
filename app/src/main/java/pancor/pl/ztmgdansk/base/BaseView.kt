@@ -1,9 +1,7 @@
 package pancor.pl.ztmgdansk.base
 
 
-interface BaseView<T> {
-
-    fun setPresenter(presenter: T)
+interface BaseView {
 
     fun showLoadingIndicator()
 

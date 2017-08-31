@@ -3,7 +3,6 @@ package pancor.pl.ztmgdansk.search_bus
 import android.content.res.Resources
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.holder_bus_stop.view.*
 import kotlinx.android.synthetic.main.holder_header.view.*
-import kotlinx.android.synthetic.main.holder_main_screen.view.*
 import kotlinx.android.synthetic.main.holder_route.view.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
@@ -69,12 +67,12 @@ class SearchResultAdapter(val resources: Resources, val schedulers: BaseSchedule
         return searchResultData[position].viewType
     }
 
-    override fun setData(newSearchResultData: List<SearchResultData>): Disposable {
-        return Flowable.just(newSearchResultData)
+    override fun setData(newSearchResultData: Flowable<List<SearchResultData>>): Disposable {
+        return newSearchResultData
                 .subscribeOn(schedulers.computation())
+                .doOnNext { searchResultData = it }
                 .map{ DiffUtil.calculateDiff(SearchResultDiff(searchResultData, it)) }
                 .observeOn(schedulers.ui())
-                .doOnNext { searchResultData = newSearchResultData }
                 .subscribe { it.dispatchUpdatesTo(this) }
     }
 
