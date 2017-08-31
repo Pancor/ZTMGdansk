@@ -35,6 +35,7 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        presenter.onSetView(this)
         setupRecyclerView()
         setupSearchViewListener()
     }
@@ -56,7 +57,7 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
         val itemDecoration = SearchResultItemDecoration()
         recyclerView.addItemDecoration(itemDecoration)
 
-
+        //TODO make it inject scheduler provider and resources
         val adapter = SearchResultAdapter(resources, SchedulerProvider())
         searchResultInterface = adapter
         recyclerView.adapter = adapter
@@ -68,7 +69,7 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
     }
 
     override fun onSearchResult(searchResultData: Flowable<List<SearchResultData>>) {
-        searchResultInterface.setData(searchResultData)
+
     }
 
     override fun showLoadingIndicator() {
@@ -83,11 +84,11 @@ class SearchBusFragment @Inject constructor(): DaggerFragment(), SearchBusContra
 
     private fun setupSearchViewListener() {
         val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
-        searchViewTextChangeListener.getSearchViewTextChangeListener()
+        searchResultInterface.setData(presenter.getSearchViewResult(searchViewTextChangeListener.getSearchViewTextChangeListener()))
     }
 
     interface SearchResult {
 
-        fun setData(newSearchResultData: Flowable<List<SearchResultData>>): Disposable
+        fun setData(newSearchResultData: Flowable<ArrayList<SearchResultData>>): Disposable
     }
 }

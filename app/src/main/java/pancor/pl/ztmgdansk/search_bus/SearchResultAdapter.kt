@@ -67,7 +67,7 @@ class SearchResultAdapter(val resources: Resources, val schedulers: BaseSchedule
         return searchResultData[position].viewType
     }
 
-    override fun setData(newSearchResultData: Flowable<List<SearchResultData>>): Disposable {
+    override fun setData(newSearchResultData: Flowable<ArrayList<SearchResultData>>): Disposable {
         return newSearchResultData
                 .subscribeOn(schedulers.computation())
                 .doOnNext { searchResultData = it }
