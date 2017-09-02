@@ -2,6 +2,7 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.subscribers.TestSubscriber
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -24,11 +25,12 @@ import pancor.pl.ztmgdansk.tools.schedulers.TrampolineSchedulerProvider
 
 class SearchBusPresenterTest {
 
-    private val ROUTES = listOf(Route(10, "10", "Route10"))
-    private val STOPS = listOf(BusStop(10, "Stop10"))
+    private val ROUTE = Route(10, "10", "Route10")
+    private val STOP = BusStop(10, "Stop10")
     private val QUERY = "10"
 
     private lateinit var presenter: SearchBusPresenter
+    private lateinit var testSubscriber: TestSubscriber<Any>
     private lateinit var schedulers: BaseSchedulerProvider
     @Mock
     private lateinit var view: SearchBusContract.View
@@ -38,117 +40,106 @@ class SearchBusPresenterTest {
     @Before
     fun setupSearchBusPresenter() {
         MockitoAnnotations.initMocks(this)
+        testSubscriber = TestSubscriber.create()
         schedulers = TrampolineSchedulerProvider()
         presenter = SearchBusPresenter(dataManager, schedulers)
-    }
-
-    /*TODO
-    @Test
-    fun attachePresenterToTheView() {
-        verify(view).setPresenter(presenter)
+        presenter.onSetView(view)
     }
 
     @Test
     fun writeSearchQueryThenCheckResult() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
+        val expectedResult = arrayListOf(
+                SearchResultData(Header(R.string.routes, R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTE, ROUTE_VIEW_TYPE),
+                SearchResultData(Header(R.string.bus_stops, R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
-        verify(view).onSearchResult(ArgumentMatchers.anyList())
+        testSubscriber.assertNoErrors()
+                .assertValues(expectedResult)
     }
 
     @Test
     fun checkIfSearchWillCallDataSourcesOnlyOneTime() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY, QUERY))
+                .subscribe(testSubscriber)
 
-        verify(view, times(1)).onSearchResult(ArgumentMatchers.anyList())
+        testSubscriber.assertValueCount(1)
     }
 
     @Test
     fun ignoreQueryIfLengthIsLessThanTwo() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
 
-        presenter.setupSearchViewObservable(Observable.just("1"))
+        presenter.getSearchViewResult(Flowable.just("1"))
+                .subscribe(testSubscriber)
 
-        verify(view, never()).onSearchResult(arrayListOf())
+        testSubscriber.assertNoValues()
     }
 
     @Test
     fun showLoadingIndicatorWhenUserIsWriting() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
         verify(view).showLoadingIndicator()
     }
 
     @Test
     fun hideLoadingIndicatorWhenResultFromQueryShowsUp() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY, QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
         verify(view).hideLoadingIndicator()
     }
 
     @Test
     fun whenNoResultThenReturnEmptyList() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        setExpectedDataResultFromDataManager(listOf(), listOf())
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
-        verify(view).onSearchResult(listOf())
+        testSubscriber.assertValues(listOf<SearchResultData>())
     }
 
     @Test
     fun whenBusStopsListIsEmptyThenReturnOnlyRoutesList() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
+        val expectedResult = arrayListOf(
+                SearchResultData(Header(R.string.routes, R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
-        verify(view).onSearchResult(ArgumentMatchers.anyList())
+        testSubscriber.assertValues(expectedResult)
     }
 
     @Test
     fun whenRoutesListIsEmptyThenReturnOnlyBusStopsList() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+        setExpectedDataResultFromDataManager(listOf(), listOf(STOP))
+        val expectedResult = arrayListOf(
+                SearchResultData(Header(R.string.bus_stops, R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
 
-        verify(view).onSearchResult(ArgumentMatchers.anyList())
+        testSubscriber.assertValues(expectedResult)
     }
 
-    @Test
-    fun whenStopsListIsNotEmptyThenAddHeaderToResult() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
-        val expectedResult = listOf(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
-                                    SearchResultData(STOPS[0], BUS_STOP_VIEW_TYPE))
-
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
-
-        verify(view).onSearchResult(expectedResult)
+    private fun setExpectedDataResultFromDataManager(route:List<Route>, stop: List<BusStop>) {
+        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(route))
+        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(stop))
     }
-
-    @Test
-    fun whenBusRoutesListIsNotEmptyThenAddHeaderToResult() {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(listOf()))
-        val expectedResult = listOf(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
-                SearchResultData(ROUTES[0], ROUTE_VIEW_TYPE))
-
-        presenter.setupSearchViewObservable(Observable.just(QUERY))
-
-        verify(view).onSearchResult(expectedResult)
-    }*/
 }
