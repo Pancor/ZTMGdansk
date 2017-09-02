@@ -5,9 +5,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerFragment
 import io.reactivex.Flowable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fr_search_bus.*
 import pancor.pl.ztmgdansk.R
@@ -18,7 +16,6 @@ import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.SearchResultData
 import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
-import pancor.pl.ztmgdansk.tools.schedulers.SchedulerProvider
 import javax.inject.Inject
 
 class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract.View {
@@ -38,7 +35,7 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
         super.onViewCreated(view, savedInstanceState)
         presenter.onSetView(this)
         setupRecyclerView()
-        setupSearchViewListener()
+        setupDataFlowToRecyclerAdapter()
     }
 
     private fun setupRecyclerView() {
@@ -47,7 +44,7 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
         val grid = GridLayoutManager(context, recyclerColsCount)
         grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                val integerViewType = when(recyclerView.adapter.getItemViewType(position)){
+                val integerViewType = when(adapter.getItemViewType(position)){
                     HEADER_VIEW_TYPE -> R.integer.searchResult_HeaderView
                     ROUTE_VIEW_TYPE -> R.integer.searchResult_RouteView
                     BUS_STOP_VIEW_TYPE -> R.integer.searchResult_BusStopView
@@ -65,6 +62,14 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
         recyclerView.adapter = adapter
     }
 
+    private fun setupDataFlowToRecyclerAdapter() {
+        val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
+        val queryFlowable = searchViewTextChangeListener.getSearchViewTextChangeListener()
+        val searchResultFlowable = presenter.getSearchViewResult(queryFlowable)
+        val searchResultDisposable = searchResultInterface.setData(searchResultFlowable)
+        disposable.add(searchResultDisposable)
+    }
+
     override fun showLoadingIndicator() {
         progressBar.visibility = View.VISIBLE
         recyclerView.visibility = View.GONE
@@ -73,14 +78,6 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
     override fun hideLoadingIndicator() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
-    }
-
-    private fun setupSearchViewListener() {
-        val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
-        val queryFlowable = searchViewTextChangeListener.getSearchViewTextChangeListener()
-        val searchResultFlowable = presenter.getSearchViewResult(queryFlowable)
-        val searchResultDisposable = searchResultInterface.setData(searchResultFlowable)
-        disposable.add(searchResultDisposable)
     }
 
     interface SearchResult {
