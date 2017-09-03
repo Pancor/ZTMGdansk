@@ -61,17 +61,14 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
     }
 
     override fun setData(newSearchResultData: Flowable<ArrayList<SearchResultData>>): Disposable {
+        var newResult = arrayListOf<SearchResultData>()
         return newSearchResultData
                 .subscribeOn(schedulers.io())
-                .map{ calculateDifference(it) }
+                .doOnNext { newResult = it }
+                .map{ DiffUtil.calculateDiff(SearchResultDiff(searchResultData, it), false) }
                 .observeOn(schedulers.ui())
+                .doOnNext { searchResultData = newResult }
                 .subscribe { it.dispatchUpdatesTo(this) }
-    }
-
-    private fun calculateDifference(newList: ArrayList<SearchResultData>): DiffUtil.DiffResult{
-        val diffResult = DiffUtil.calculateDiff(SearchResultDiff(searchResultData, newList), false)
-        searchResultData = newList
-        return diffResult
     }
 
     inner class HeaderHolder(itemView: View) : BaseViewHolder(itemView) {
