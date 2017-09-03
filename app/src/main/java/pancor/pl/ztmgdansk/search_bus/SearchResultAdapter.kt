@@ -13,22 +13,22 @@ import kotlinx.android.synthetic.main.holder_header.view.*
 import kotlinx.android.synthetic.main.holder_route.view.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
+import pancor.pl.ztmgdansk.base.BaseViewHolder
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.di.ActivityScope
-import pancor.pl.ztmgdansk.di.FragmentScope
 import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import javax.inject.Inject
 
 @ActivityScope
 class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvider) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>(), SearchBusFragment.SearchResult {
+        RecyclerView.Adapter<BaseViewHolder>(), SearchBusFragment.SearchResult {
 
     private lateinit var resources: Resources
     private var searchResultData: List<SearchResultData> = listOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         resources = parent.context.resources
         val inflater = LayoutInflater.from(parent.context)
         when (viewType) {
@@ -48,21 +48,8 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
-        when (getItemViewType(position)) {
-            HEADER_VIEW_TYPE -> {
-                val headerHolder = holder as HeaderHolder
-                headerHolder.bindView(position)
-            }
-            ROUTE_VIEW_TYPE -> {
-                val routeHolder = holder as RouteHolder
-                routeHolder.bindView(position)
-            }
-            BUS_STOP_VIEW_TYPE -> {
-                val busStopHolder = holder as BusStopHolder
-                busStopHolder.bindView(position)
-            }
-        }
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        holder.bindView(position)
     }
 
     override fun getItemCount(): Int {
@@ -76,31 +63,36 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
     override fun setData(newSearchResultData: Flowable<ArrayList<SearchResultData>>): Disposable {
         return newSearchResultData
                 .subscribeOn(schedulers.io())
-                .doOnNext { searchResultData = it }
-                .map{ DiffUtil.calculateDiff(SearchResultDiff(searchResultData, it)) }
+                .map{ calculateDifference(it) }
                 .observeOn(schedulers.ui())
                 .subscribe { it.dispatchUpdatesTo(this) }
     }
 
-    inner class HeaderHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    private fun calculateDifference(newList: ArrayList<SearchResultData>): DiffUtil.DiffResult{
+        val diffResult = DiffUtil.calculateDiff(SearchResultDiff(searchResultData, newList), false)
+        searchResultData = newList
+        return diffResult
+    }
 
-        fun bindView(position: Int) {
+    inner class HeaderHolder(itemView: View) : BaseViewHolder(itemView) {
+
+        override fun bindView(position: Int) {
             val header = searchResultData[position].model as Header
             itemView.headerTitle.text = resources.getString(header.title)
         }
     }
 
-    inner class RouteHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    inner class RouteHolder(itemView: View) : BaseViewHolder(itemView) {
 
-        fun bindView(position: Int) {
+        override fun bindView(position: Int) {
             val route = searchResultData[position].model as Route
             itemView.routeShortName.text = route.routeShortName
         }
     }
 
-    inner class BusStopHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    inner class BusStopHolder(itemView: View) : BaseViewHolder(itemView) {
 
-        fun bindView(position: Int) {
+        override fun bindView(position: Int) {
             val busStop = searchResultData[position].model as BusStop
             itemView.busStopName.text = busStop.stopName
         }
