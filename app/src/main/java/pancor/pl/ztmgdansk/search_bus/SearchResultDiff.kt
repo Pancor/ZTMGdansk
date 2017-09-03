@@ -6,8 +6,8 @@ import pancor.pl.ztmgdansk.models.Header
 import pancor.pl.ztmgdansk.models.Route
 import pancor.pl.ztmgdansk.models.SearchResultData
 
-class SearchResultDiff(private val oldList: List<SearchResultData>, private val newList: List<SearchResultData>) :
-        DiffUtil.Callback() {
+class SearchResultDiff(private val oldList: List<SearchResultData>,
+                       private val newList: List<SearchResultData>) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         oldList[oldItemPosition].viewType == newList[newItemPosition].viewType &&

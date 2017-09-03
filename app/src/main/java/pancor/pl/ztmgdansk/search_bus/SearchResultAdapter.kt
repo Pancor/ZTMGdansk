@@ -95,7 +95,6 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
         fun bindView(position: Int) {
             val route = searchResultData[position].model as Route
             itemView.routeShortName.text = route.routeShortName
-            itemView.busType.text = "Autobus"
         }
     }
 
