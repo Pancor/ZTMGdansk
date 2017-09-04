@@ -50,9 +50,9 @@ class SearchBusPresenterTest {
     fun writeSearchQueryThenCheckResult() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes, R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE),
-                SearchResultData(Header(R.string.bus_stops, R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
                 SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -116,7 +116,7 @@ class SearchBusPresenterTest {
     fun whenBusStopsListIsEmptyThenReturnOnlyRoutesList() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes, R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -129,7 +129,7 @@ class SearchBusPresenterTest {
     fun whenRoutesListIsEmptyThenReturnOnlyBusStopsList() {
         setExpectedDataResultFromDataManager(listOf(), listOf(STOP))
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.bus_stops, R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
                 SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
