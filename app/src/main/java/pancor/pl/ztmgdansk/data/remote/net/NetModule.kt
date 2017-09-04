@@ -13,6 +13,7 @@ import pancor.pl.ztmgdansk.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
@@ -34,14 +35,8 @@ class NetModule {
     @Provides @Singleton fun provideOkHttpClient(cache: Cache): OkHttpClient {
         val client = OkHttpClient.Builder()
         client.cache(cache)
-        client.addInterceptor { chain ->
-            val request = chain.request()
-                    .newBuilder()
-                    .build()
-            chain.proceed(request)
-        }
         if (BuildConfig.DEBUG){
-            val logging = HttpLoggingInterceptor()
+            val logging = HttpLoggingInterceptor{ Timber.tag("OkHttp").d(it) }
             logging.level = HttpLoggingInterceptor.Level.BODY
             client.addInterceptor(logging)
         }
