@@ -8,7 +8,10 @@ import pancor.pl.ztmgdansk.models.SearchResultData
 
 interface SearchBusContract {
 
-    interface View : BaseView
+    interface View : BaseView {
+
+        fun emptyResultFromServer()
+    }
 
     interface Presenter : BasePresenter<View> {
 

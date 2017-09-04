@@ -73,11 +73,19 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
     override fun showLoadingIndicator() {
         progressBar.visibility = View.VISIBLE
         recyclerView.visibility = View.GONE
+        noResultView.visibility = View.GONE
     }
 
     override fun hideLoadingIndicator() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
+        noResultView.visibility = View.GONE
+    }
+
+    override fun emptyResultFromServer() {
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        noResultView.visibility = View.VISIBLE
     }
 
     interface SearchResult {

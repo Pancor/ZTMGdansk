@@ -103,16 +103,6 @@ class SearchBusPresenterTest {
     }
 
     @Test
-    fun whenNoResultThenReturnEmptyList() {
-        setExpectedDataResultFromDataManager(listOf(), listOf())
-
-        presenter.getSearchViewResult(Flowable.just(QUERY))
-                .subscribe(testSubscriber)
-
-        testSubscriber.assertValues(listOf<SearchResultData>())
-    }
-
-    @Test
     fun whenBusStopsListIsEmptyThenReturnOnlyRoutesList() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
         val expectedResult = arrayListOf(
@@ -136,6 +126,16 @@ class SearchBusPresenterTest {
                 .subscribe(testSubscriber)
 
         testSubscriber.assertValues(expectedResult)
+    }
+
+    @Test
+    fun whenSearchResultIsEmptyThenInformViewAboutIt() {
+        setExpectedDataResultFromDataManager(listOf(), listOf())
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe()
+
+        verify(view).emptyResultFromServer()
     }
 
     private fun setExpectedDataResultFromDataManager(route:List<Route>, stop: List<BusStop>) {

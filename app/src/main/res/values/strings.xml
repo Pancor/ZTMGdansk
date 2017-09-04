@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ZTM Gdansk</string>
     <string name="search">Search&#8230;</string>
-    <string name="routes">Linie</string>
-    <string name="bus_stops">Przystanki</string>
+    <string name="routes">Bus routes</string>
+    <string name="bus_stops">Bus stops</string>
+    <string name="no_result">No results</string>
 </resources>

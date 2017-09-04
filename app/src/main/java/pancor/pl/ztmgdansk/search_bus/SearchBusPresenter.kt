@@ -38,6 +38,7 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
                                      routes, stops ->  Pair(routes, stops)}) }
                 .map { (routes, stops) -> mergeRoutesWithStopsAndAddHeaders(routes, stops) }
                 .observeOn(schedulers.ui())
+                .filter { returnTrueWhenListIsNotEmpty(it)}
                 .doOnNext{ view.hideLoadingIndicator() }
     }
 
@@ -53,6 +54,15 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
             stops.mapTo(searchResultData) { SearchResultData(it, BUS_STOP_VIEW_TYPE) }
         }
         return searchResultData
+    }
+
+    private fun returnTrueWhenListIsNotEmpty(list: ArrayList<SearchResultData>): Boolean {
+        if (list.isEmpty()) {
+            view.emptyResultFromServer()
+            return false
+        } else {
+            return true
+        }
     }
 
     override fun onSetView(view: SearchBusContract.View) {
