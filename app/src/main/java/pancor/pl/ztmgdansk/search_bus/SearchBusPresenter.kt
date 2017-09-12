@@ -1,18 +1,13 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.di.ActivityScope
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.data.BusDataContract
-import pancor.pl.ztmgdansk.data.BusDataManager
-import pancor.pl.ztmgdansk.models.BusStop
-import pancor.pl.ztmgdansk.models.Header
-import pancor.pl.ztmgdansk.models.Route
-import pancor.pl.ztmgdansk.models.SearchResultData
+import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -31,12 +26,14 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
                 .observeOn(schedulers.ui())
                 .doOnNext { view.showLoadingIndicator() }
                 .observeOn(schedulers.io())
-                .flatMap { query ->
-                    Flowable.zip(busDataManager.getBusRoutesByQuery(query),
-                                 busDataManager.getBusStopsByQuery(query),
-                                 BiFunction<List<Route>, List<BusStop>, Pair<List<Route>, List<BusStop>>> {
-                                     routes, stops ->  Pair(routes, stops)}) }
-                .map { (routes, stops) -> mergeRoutesWithStopsAndAddHeaders(routes, stops) }
+                .flatMap { busDataManager.getBusStopsAndRoutesByQuery(it) }
+                .map { result ->
+                    if (!result.isError) {
+                        mergeRoutesWithStopsAndAddHeaders(result.routes, result.stops)
+                    } else {
+                        arrayListOf()
+                    }
+                }
                 .observeOn(schedulers.ui())
                 .filter { returnTrueWhenListIsNotEmpty(it)}
                 .doOnNext{ view.hideLoadingIndicator() }

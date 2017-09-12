@@ -11,6 +11,8 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.holder_bus_stop.view.*
 import kotlinx.android.synthetic.main.holder_header.view.*
 import kotlinx.android.synthetic.main.holder_route.view.*
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.BaseViewHolder

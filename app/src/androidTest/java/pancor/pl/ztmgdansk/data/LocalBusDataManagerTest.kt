@@ -42,6 +42,7 @@ class LocalBusDataManagerTest {
         database.close()
     }
 
+    /* TODO
     @Test
     fun insertRoutesThenGetItBack() {
         localBusDataManager.insertBusRoutes(ROUTES)
@@ -117,6 +118,5 @@ class LocalBusDataManagerTest {
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertValue(expectedResult)
     }
-
-
+*/
 }

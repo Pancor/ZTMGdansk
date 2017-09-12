@@ -1,14 +1,15 @@
 package pancor.pl.ztmgdansk.data
 
 import io.reactivex.Flowable
-import pancor.pl.ztmgdansk.data.local.LocalBusDataContract
+import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Result
 import pancor.pl.ztmgdansk.models.Route
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataContract,
+class BusDataManager @Inject constructor(val localBusDataManager: BusDataContract.Local,
                                          val remoteBusDataManager: BusDataContract) : BusDataContract {
 
     override fun getBusRoutes(): Flowable<List<Route>> {
@@ -29,27 +30,25 @@ class BusDataManager @Inject constructor(val localBusDataManager: LocalBusDataCo
                 .toFlowable()
     }
 
-    override fun getBusStopsByQuery(query: String): Flowable<List<BusStop>> {
-        val networkSourceWithSave: Flowable<List<BusStop>> = remoteBusDataManager
-                .getBusStopsByQuery(query)
-                .doOnNext { localBusDataManager.insertBusStops(it) }
-                .onErrorReturn { listOf() }
-        val localSource: Flowable<List<BusStop>> = localBusDataManager
-                .getBusStopsByQuery(query)
-                .onErrorReturn { listOf() }
-        return localSource.mergeWith(networkSourceWithSave)
-                .distinct()
-    }
-
-    override fun getBusRoutesByQuery(query: String): Flowable<List<Route>> {
-        val networkSourceWithSave: Flowable<List<Route>> = remoteBusDataManager
-                .getBusRoutesByQuery(query)
-                .doOnNext { localBusDataManager.insertBusRoutes(it) }
-                .onErrorReturn { listOf() }
-        val localSource: Flowable<List<Route>> = localBusDataManager
-                .getBusRoutesByQuery(query)
-                .onErrorReturn { listOf() }
-        return localSource.mergeWith(networkSourceWithSave)
-                .distinct()
+    override fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result> {
+        val networkSourceWithSave: Flowable<Result> = remoteBusDataManager
+                .getBusStopsAndRoutesByQuery(query)
+                .doOnNext { result ->
+                    if (!result.isError) {
+                        localBusDataManager.insertBusRoutes(result.routes)
+                        localBusDataManager.insertBusStops(result.stops)
+                    }
+                }
+        val localSource: Flowable<Result> = localBusDataManager.getBusStopsAndRoutesByQuery(query)
+        return Flowable.zip(localSource, networkSourceWithSave, BiFunction { local, remote ->
+            val stops = local.stops
+                    .plus(remote.stops)
+                    .distinct()
+            val routes = local.routes
+                    .plus(remote.routes)
+                    .distinct()
+            Result(isError = remote.isError, resultCode = remote.resultCode, stops = stops,
+                    routes = routes)
+        })
     }
 }

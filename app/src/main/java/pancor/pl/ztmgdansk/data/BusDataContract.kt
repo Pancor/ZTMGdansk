@@ -3,6 +3,8 @@ package pancor.pl.ztmgdansk.data
 import io.reactivex.Flowable
 import io.reactivex.Single
 import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Response
+import pancor.pl.ztmgdansk.models.Result
 import pancor.pl.ztmgdansk.models.Route
 
 interface BusDataContract {
@@ -11,7 +13,14 @@ interface BusDataContract {
 
     fun getBusStops(): Flowable<List<BusStop>>
 
-    fun getBusStopsByQuery(query: String): Flowable<List<BusStop>>
+    fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result>
 
-    fun getBusRoutesByQuery(query: String): Flowable<List<Route>>
+    interface Local : BusDataContract {
+
+        fun insertBusRoutes(busRoutes: List<Route>)
+
+        fun insertBusStops(busStops: List<BusStop>)
+
+        fun deleteData()
+    }
 }
