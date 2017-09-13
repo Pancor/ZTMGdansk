@@ -2,6 +2,7 @@ package pancor.pl.ztmgdansk.data.local.database
 
 import android.arch.persistence.room.*
 import io.reactivex.Flowable
+import io.reactivex.Single
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Route
 
@@ -13,7 +14,7 @@ interface BusDao {
 
     @Query("SELECT * FROM Route WHERE routeShortName LIKE :query " +
             "OR routeLongName LIKE :query;")
-    fun getRoutesByQuery(query: String): Flowable<List<Route>>
+    fun getRoutesByQuery(query: String): Single<List<Route>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplaceRoutes(routes: List<Route>)
@@ -25,7 +26,7 @@ interface BusDao {
     fun getAllBusStops(): Flowable<List<BusStop>>
 
     @Query("SELECT * FROM BusStop WHERE stopName LIKE :query;")
-    fun getBusStopsByQuery(query: String): Flowable<List<BusStop>>
+    fun getBusStopsByQuery(query: String): Single<List<BusStop>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplaceBusStops(busStops: List<BusStop>)

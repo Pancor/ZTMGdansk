@@ -1,6 +1,8 @@
 package pancor.pl.ztmgdansk.data.local
 
+import android.arch.persistence.room.EmptyResultSetException
 import io.reactivex.Flowable
+import io.reactivex.Single
 import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.data.local.database.BusDao
 import pancor.pl.ztmgdansk.models.BusStop
@@ -17,13 +19,16 @@ class LocalBusDataManager @Inject constructor(private val busDao: BusDao) : BusD
     private val TIME_UNIT = TimeUnit.SECONDS
 
     override fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result> {
-        return busDao.getBusStopsByQuery(query)
-                .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT, Flowable.just(listOf()))
-                .flatMap { stops ->
-                    busDao.getRoutesByQuery(query)
-                            .timeout(TIMEOUT_IN_SECONDS, TIME_UNIT, Flowable.just(listOf()))
-                            .map { Result(isError = false, resultCode = Result.OK, stops = stops,
-                                    routes = listOf()) } }
+        return busDao.getBusStopsByQuery("%$query%")
+                .onErrorReturn { listOf() }
+                .flatMap { busDao.getRoutesByQuery(query)
+                            .onErrorReturn { listOf() }
+                            .map { routes -> Pair(it, routes) }
+                }
+                .map { (stops, routes) -> Result(isError = false, resultCode = Result.OK,
+                        stops = stops, routes = routes)
+                }
+                .toFlowable()
     }
 
     override fun getBusRoutes(): Flowable<List<Route>> {
