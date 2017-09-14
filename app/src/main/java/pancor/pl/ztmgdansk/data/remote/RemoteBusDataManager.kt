@@ -6,7 +6,6 @@ import pancor.pl.ztmgdansk.data.BusDataContract
 import pancor.pl.ztmgdansk.data.remote.net.InternetConnection
 import pancor.pl.ztmgdansk.data.remote.net.NetService
 import pancor.pl.ztmgdansk.models.BusStop
-import pancor.pl.ztmgdansk.models.Response
 import pancor.pl.ztmgdansk.models.Result
 import pancor.pl.ztmgdansk.models.Route
 import javax.inject.Inject
@@ -53,10 +52,5 @@ class RemoteBusDataManager @Inject constructor(private val netService: NetServic
                                 stops = listOf(), routes = listOf()))
                     }
                 }
-    }
-
-    private fun <T> returnNoInternetConnectionResult(): Flowable<Response<T>> {
-        return Flowable.just(Response(isError = true,
-                responseCode = Response.NO_INTERNET_CONNECTION, response = listOf()))
     }
 }

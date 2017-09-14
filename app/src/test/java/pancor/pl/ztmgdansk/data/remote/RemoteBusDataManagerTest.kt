@@ -9,10 +9,10 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import pancor.pl.ztmgdansk.data.remote.net.NetService
 import pancor.pl.ztmgdansk.models.Route
-import pancor.pl.ztmgdansk.models.Response
 import org.mockito.Mockito.`when`
 import pancor.pl.ztmgdansk.data.remote.net.InternetConnection
 import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Result
 
 class RemoteBusDataManagerTest {
 
@@ -34,98 +34,36 @@ class RemoteBusDataManagerTest {
         MockitoAnnotations.initMocks(this)
         remoteBusDataManager = RemoteBusDataManager(netService, internetConnection)
         testSubscriber = TestSubscriber()
-
-        `when`(internetConnection.isInternet()).thenReturn(Flowable.just(true)) //TODO  you now what to do
     }
 
-    /* TODO
     @Test
-    fun returnRouteServerResponseWithErrorThenCallOnError() {
-        val invalidServerResponse = Response(isError = true,
-                responseCode = 1, response = listOf(ROUTE))
-        `when`(netService.getRoutes()).thenReturn(Single.just(invalidServerResponse))
+    fun getRoutesAndStopsByQueryWhenNoError() {
+        setInternetConnection(true)
+        val serverResponse = Result(isError = false, resultCode = Result.OK,
+                stops = listOf(STOP), routes = listOf(ROUTE))
+        `when`(netService.getBusStopsAndRoutesFromSearch(QUERY))
+                .thenReturn(Single.just(serverResponse))
 
-        remoteBusDataManager.getBusRoutes()
+        remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertError(Exception::class.java)
+        testSubscriber.assertValue(serverResponse)
     }
 
     @Test
-    fun returnStopServerResponseWithErrorThenCallOnError() {
-        val invalidServerResponse = Response(isError = true,
-                responseCode = 1, response = listOf(STOP))
-        `when`(netService.getBusStops()).thenReturn(Single.just(invalidServerResponse))
+    fun getRoutesAndStopsByQueryWhenNoInternet() {
+        setInternetConnection(false)
+        val expectedResponse = Result(isError = true, resultCode = Result.NO_INTERNET_CONNECTION,
+                stops = listOf(), routes = listOf())
 
-        remoteBusDataManager.getBusStops()
+        remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertError(Exception::class.java)
+        testSubscriber.assertValue(expectedResponse)
     }
 
-    @Test
-    fun getStopServerResponseWhenNoError() {
-        val serverResponse = Response(isError = false, responseCode = 1,
-                response = listOf(STOP))
-        `when`(netService.getBusStops()).thenReturn(Single.just(serverResponse))
 
-        remoteBusDataManager.getBusStops().subscribe(testSubscriber)
-
-        testSubscriber.assertValue(listOf(STOP))
+    private fun setInternetConnection(isConnected: Boolean) {
+        `when`(internetConnection.isInternet()).thenReturn(Flowable.just(isConnected))
     }
-
-    @Test
-    fun getRouteServerResponseWhenNoError() {
-        val serverResponse = Response(isError = false, responseCode = 1,
-                response = listOf(ROUTE))
-        `when`(netService.getRoutes()).thenReturn(Single.just(serverResponse))
-
-        remoteBusDataManager.getBusRoutes().subscribe(testSubscriber)
-
-        testSubscriber.assertValue(listOf(ROUTE))
-    }
-
-    @Test
-    fun getRouteByQueryWhenNoError() {
-        val serverResponse = Response(isError = false, responseCode = 1,
-                response = listOf(ROUTE))
-        `when`(netService.getBusRoutesByQuery(QUERY)).thenReturn(Single.just(serverResponse))
-
-        remoteBusDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertValue(listOf(ROUTE))
-    }
-
-    @Test
-    fun getRouteByQueryWhenIsError() {
-        val serverResponse = Response(isError = true, responseCode = 1,
-                response = listOf(ROUTE))
-        `when`(netService.getBusRoutesByQuery(QUERY)).thenReturn(Single.just(serverResponse))
-
-        remoteBusDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertError(Exception::class.java)
-    }
-
-    @Test
-    fun getStopByQueryWhenNoError() {
-        val serverResponse = Response(isError = false, responseCode = 1,
-                response = listOf(STOP))
-        `when`(netService.getBusStopsByQuery(QUERY)).thenReturn(Single.just(serverResponse))
-
-        remoteBusDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertValue(listOf(STOP))
-    }
-
-    @Test
-    fun getStopByQueryWhenIsError() {
-        val serverResponse = Response(isError = true, responseCode = 1,
-                response = listOf(STOP))
-        `when`(netService.getBusStopsByQuery(QUERY)).thenReturn(Single.just(serverResponse))
-
-        remoteBusDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertError(Exception::class.java)
-    } */
 }
