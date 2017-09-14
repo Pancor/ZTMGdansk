@@ -21,7 +21,7 @@ class LocalBusDataManager @Inject constructor(private val busDao: BusDao) : BusD
     override fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result> {
         return busDao.getBusStopsByQuery("%$query%")
                 .onErrorReturn { listOf() }
-                .flatMap { busDao.getRoutesByQuery(query)
+                .flatMap { busDao.getRoutesByQuery("%$query%")
                             .onErrorReturn { listOf() }
                             .map { routes -> Pair(it, routes) }
                 }
