@@ -11,5 +11,6 @@ data class Result(@SerializedName("isError") val isError: Boolean,
     companion object {
         val NO_INTERNET_CONNECTION = 100
         val OK = 12
+        val UNKNOWN_ERROR = 110
     }
 }

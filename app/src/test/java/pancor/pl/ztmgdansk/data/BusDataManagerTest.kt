@@ -5,17 +5,19 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import pancor.pl.ztmgdansk.models.BusStop
+import pancor.pl.ztmgdansk.models.Result
 import pancor.pl.ztmgdansk.models.Route
 
 class BusDataManagerTest {
 
     val ROUTES = listOf(Route(1, "1", "Route1"), Route(2, "2", "Route2"))
     val STOPS = listOf(BusStop(1, "Stop1"), BusStop(2, "Stop2"))
+    val RESPONSE = Result(isError = false, resultCode = Result.OK, stops = STOPS,
+            routes = ROUTES)
     val QUERY = "query123"
 
     @Mock
@@ -34,148 +36,81 @@ class BusDataManagerTest {
         testSubscriber = TestSubscriber()
     }
 
-    /* TODO
     @Test
-    fun getRoutesFromRemoteSourceWhenLocalSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
+    fun getStopsAndRoutesByQueryThenInsertDataToLocalDatabase() {
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
 
-        busDataManager.getBusRoutes().subscribe(testSubscriber)
-
-        verify(remoteBusDataManager).getBusRoutes()
-        testSubscriber.assertValue(ROUTES)
-    }
-
-    @Test
-    fun getRoutesFromLocalSourceWhenRemoteSourceIsNotAvailable(){
-        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
-        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.empty())
-
-        busDataManager.getBusRoutes().subscribe(testSubscriber)
-
-        verify(localBusDataManager).getBusRoutes()
-        testSubscriber.assertValue(ROUTES)
-    }
-
-    @Test
-    fun getStopsFromRemoteSourceWhenLocalSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
-
-        busDataManager.getBusStops().subscribe(testSubscriber)
-
-        verify(remoteBusDataManager).getBusStops()
-        testSubscriber.assertValue(STOPS)
-    }
-
-    @Test
-    fun getStopsFromLocalSourceWhenRemoteSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
-        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.empty())
-
-        busDataManager.getBusStops().subscribe(testSubscriber)
-
-        verify(localBusDataManager).getBusStops()
-        testSubscriber.assertValue(STOPS)
-    }
-
-    @Test
-    fun getStopsFromRemoteThenCheckIfStopsAreInsertedToLocalDatabase() {
-        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
-
-        busDataManager.getBusStops().subscribe()
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe()
 
         verify(localBusDataManager).insertBusStops(STOPS)
-    }
-
-    @Test
-    fun getRoutesFromRemoteThenCheckIfRoutesAreInsertedToLocalDatabase() {
-        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
-
-        busDataManager.getBusRoutes().subscribe()
-
         verify(localBusDataManager).insertBusRoutes(ROUTES)
     }
 
     @Test
-    fun getStopsThenCheckIfOnlyOneTimeStopsAreEmitted() {
-        `when`(localBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
-        `when`(remoteBusDataManager.getBusStops()).thenReturn(Flowable.just(STOPS))
+    fun getStopsAndRoutesByQueryThenDoNotInsertDataToLocalDatabaseWhenIsError() {
+        val resultWithError = Result(isError = true, resultCode = Result.UNKNOWN_ERROR,
+                stops = listOf(), routes = listOf())
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(resultWithError))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(resultWithError))
 
-        busDataManager.getBusStops().subscribe(testSubscriber)
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe()
 
-        testSubscriber.assertValueCount(1)
+        verify(localBusDataManager, times(0)).insertBusStops(STOPS)
+        verify(localBusDataManager, times(0)).insertBusRoutes(ROUTES)
     }
 
     @Test
-    fun getRoutesThenCheckIfOnlyOneTimeRoutesAreEmitted() {
-        `when`(localBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
-        `when`(remoteBusDataManager.getBusRoutes()).thenReturn(Flowable.just(ROUTES))
+    fun getRoutesAndStopsByQueryWhenLocalSourceIsNotAvailable() {
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
+                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
 
-        busDataManager.getBusRoutes().subscribe(testSubscriber)
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe(testSubscriber)
 
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertValue(RESPONSE)
     }
 
     @Test
-    fun getStopsByQueryThenCheckIfStopsAreInsertedToLocalDatabase() {
-        `when`(localBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
-        `when`(remoteBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
+    fun getRoutesAndStopsByQueryWhenNoInternet() {
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
+                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
 
-        busDataManager.getBusStopsByQuery(QUERY).subscribe()
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe(testSubscriber)
 
-        verify(localBusDataManager).insertBusStops(STOPS)
+        testSubscriber.assertValue(RESPONSE)
     }
 
     @Test
-    fun getRoutesByQueryThenCheckIfRoutesAreInsertedToLocalDatabase() {
-        `when`(localBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(remoteBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+    fun getRoutesAndStopsWithoutRepetition() {
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
 
-        busDataManager.getBusRoutesByQuery(QUERY).subscribe()
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe(testSubscriber)
 
-        verify(localBusDataManager).insertBusRoutes(ROUTES)
+        testSubscriber.assertValue(RESPONSE)
     }
 
     @Test
-    fun getRoutesByQueryWhenLocalSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
+    fun getRoutesAndStopsThenCombineDataFromTwoSourcesIntoOne() {
+        val route = Route(23, "23", "Route23")
+        val stop = BusStop(23, "Stop23")
+        val remoteResult = Result(isError = false, resultCode = Result.OK, routes = listOf(route),
+                stops = listOf(stop))
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(remoteResult))
+        val expectedResult = Result(isError = false, resultCode = Result.OK, routes = ROUTES.plus(route),
+                stops = STOPS.plus(stop))
 
-        busDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe(testSubscriber)
 
-        testSubscriber.assertValue(ROUTES)
+        testSubscriber.assertValue(expectedResult)
     }
-
-    @Test
-    fun getStopsByQueryWhenLocalSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.empty())
-        `when`(remoteBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
-
-        busDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertValue(STOPS)
-    }
-
-    @Test
-    fun getRoutesByQueryWhenRemoteSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(ROUTES))
-        `when`(remoteBusDataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.empty())
-
-        busDataManager.getBusRoutesByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertValue(ROUTES)
-    }
-
-    @Test
-    fun getStopsByQueryWhenRemoteSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(STOPS))
-        `when`(remoteBusDataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.empty())
-
-        busDataManager.getBusStopsByQuery(QUERY).subscribe(testSubscriber)
-
-        testSubscriber.assertValue(STOPS)
-    }*/
 }
