@@ -40,52 +40,6 @@ class LocalBusDataManagerTest {
     }
 
     @Test
-    fun insertRoutesThenGetItBack() {
-        localBusDataManager.insertBusRoutes(ROUTES)
-
-        localBusDataManager.getBusRoutes()
-                .subscribe(testSubscriber)
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertValue(ROUTES)
-    }
-
-    @Test
-    fun insertBusStopsThenGetItBack() {
-        localBusDataManager.insertBusStops(STOPS)
-
-        localBusDataManager.getBusStops()
-                .subscribe(testSubscriber)
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertValue(STOPS)
-    }
-
-    @Test
-    fun insertTwoTimesTheSameBusStops() {
-        localBusDataManager.insertBusStops(STOPS)
-        localBusDataManager.insertBusStops(STOPS)
-
-        localBusDataManager.getBusStops()
-                .subscribe(testSubscriber)
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertValue(STOPS)
-    }
-
-    @Test
-    fun insertTwoTimesTheSameRoutes() {
-        localBusDataManager.insertBusRoutes(ROUTES)
-        localBusDataManager.insertBusRoutes(ROUTES)
-
-        localBusDataManager.getBusRoutes()
-                .subscribe(testSubscriber)
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertValue(ROUTES)
-    }
-
-    @Test
     fun checkIfPercentageCharactersAreAddedToQuery() {
         localBusDataManager.insertBusStops(STOPS)
         val stop_query = "top"

@@ -10,12 +10,6 @@ import retrofit2.http.Query
 
 interface NetService {
 
-    @GET("getBusRoutes")
-    fun getRoutes(): Single<Response<Route>>
-
-    @GET("getBusStops")
-    fun getBusStops(): Single<Response<BusStop>>
-
     @GET("getStopsFromSearch")
     fun getBusStopsByQuery(@Query("search") query: String): Single<Response<BusStop>>
 

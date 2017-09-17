@@ -9,10 +9,6 @@ import pancor.pl.ztmgdansk.models.Route
 
 interface BusDataContract {
 
-    fun getBusRoutes(): Flowable<List<Route>>
-
-    fun getBusStops(): Flowable<List<BusStop>>
-
     fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result>
 
     interface Local : BusDataContract {

@@ -10,7 +10,9 @@ import org.mockito.MockitoAnnotations
 import pancor.pl.ztmgdansk.data.local.database.BusDao
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Result
+import pancor.pl.ztmgdansk.models.Route
 
 class LocalBusDataManagerTest {
 
@@ -33,6 +35,24 @@ class LocalBusDataManagerTest {
 
         verify(busDao).deleteAllBusRoutes()
         verify(busDao).deleteAllBusStops()
+    }
+
+    @Test
+    fun insertRoutes() {
+        val route = listOf(Route(1, "1", "1"))
+
+        localBusDataManager.insertBusRoutes(route)
+
+        verify(busDao).insertOrReplaceRoutes(route)
+    }
+
+    @Test
+    fun insertBusStops() {
+        val stop = listOf(BusStop(1, "1"))
+
+        localBusDataManager.insertBusStops(stop)
+
+        verify(busDao).insertOrReplaceBusStops(stop)
     }
 
     @Test
