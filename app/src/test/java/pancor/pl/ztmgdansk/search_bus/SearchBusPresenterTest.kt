@@ -1,12 +1,9 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.subscribers.TestSubscriber
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -15,11 +12,7 @@ import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.data.BusDataContract
-import pancor.pl.ztmgdansk.data.BusDataManager
-import pancor.pl.ztmgdansk.models.BusStop
-import pancor.pl.ztmgdansk.models.Header
-import pancor.pl.ztmgdansk.models.Route
-import pancor.pl.ztmgdansk.models.SearchResultData
+import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import pancor.pl.ztmgdansk.tools.schedulers.TrampolineSchedulerProvider
 
@@ -46,7 +39,6 @@ class SearchBusPresenterTest {
         presenter.onSetView(view)
     }
 
-    /* TODO
     @Test
     fun writeSearchQueryThenCheckResult() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
@@ -139,8 +131,32 @@ class SearchBusPresenterTest {
         verify(view).emptyResultFromServer()
     }
 
-    private fun setExpectedDataResultFromDataManager(route:List<Route>, stop: List<BusStop>) {
-        `when`(dataManager.getBusRoutesByQuery(QUERY)).thenReturn(Flowable.just(route))
-        `when`(dataManager.getBusStopsByQuery(QUERY)).thenReturn(Flowable.just(stop))
-    }*/
+    @Test
+    fun whenRoutesListIsNotEmptyThenAddHeader() {
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
+        val expectedResult = arrayListOf(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(expectedResult)
+    }
+
+    @Test
+    fun whenBusStopListIsNotEmptyThenAddHeader() {
+        setExpectedDataResultFromDataManager(listOf(), listOf(STOP))
+        val expectedResult = arrayListOf(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(expectedResult)
+    }
+
+    private fun setExpectedDataResultFromDataManager(route: List<Route>, stop: List<BusStop>) {
+        val result = Result(isError = false, resultCode = Result.OK, routes = route, stops = stop)
+        `when`(dataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(result))
+    }
 }
