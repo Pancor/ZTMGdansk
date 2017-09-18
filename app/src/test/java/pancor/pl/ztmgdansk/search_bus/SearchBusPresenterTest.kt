@@ -2,8 +2,10 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.Assert.*
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -128,7 +130,7 @@ class SearchBusPresenterTest {
         presenter.getSearchViewResult(Flowable.just(QUERY))
                 .subscribe()
 
-        verify(view).emptyResultFromServer()
+        verify(view).onEmptyResultFromServer()
     }
 
     @Test
@@ -155,8 +157,71 @@ class SearchBusPresenterTest {
         testSubscriber.assertValue(expectedResult)
     }
 
+    @Test
+    fun whenNoInternetThenInformViewAboutIt() {
+        setExpectedDataResultFromDataManager(listOf(), listOf(), Result.NO_INTERNET_CONNECTION)
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe()
+
+        verify(view).onNoInternetConnection()
+    }
+
+    @Test
+    fun whenUnknownErrorOnServerSideOccurredThenInformViewAboutIt() {
+        setExpectedDataResultFromDataManager(listOf(), listOf(), Result.UNKNOWN_ERROR)
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe()
+
+        verify(view).onUnknownErrorOnServerSide()
+    }
+
+    @Test
+    fun whenNoInternetThenStillShowDataFromLocalSource() {
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(), Result.NO_INTERNET_CONNECTION)
+        val expectedResult = arrayListOf(
+                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(expectedResult)
+    }
+
+    @Test
+    fun whenUnknownErrorOnServerSideOccurredThenStillShowDataFromLocalSource() {
+        setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(), Result.UNKNOWN_ERROR)
+        val expectedResult = arrayListOf(
+                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(expectedResult)
+    }
+
+    @Test
+    fun whenUnknownResultCodeFromResultThenThrowException() {
+        val WRONG_RESULT_CODE = 805720485
+        setExpectedDataResultFromDataManager(listOf(), listOf(), WRONG_RESULT_CODE)
+
+        presenter.getSearchViewResult(Flowable.just(QUERY))
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertError(IllegalArgumentException::class.java)
+                .assertErrorMessage("Could not resolve errorCode: $WRONG_RESULT_CODE")
+    }
+
     private fun setExpectedDataResultFromDataManager(route: List<Route>, stop: List<BusStop>) {
         val result = Result(isError = false, resultCode = Result.OK, routes = route, stops = stop)
+        `when`(dataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(result))
+    }
+
+    private fun setExpectedDataResultFromDataManager(route: List<Route>, stop: List<BusStop>, errorCode: Int) {
+        val result = Result(isError = true, resultCode = errorCode, routes = route, stops = stop)
         `when`(dataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(result))
     }
 }

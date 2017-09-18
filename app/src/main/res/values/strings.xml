@@ -4,4 +4,6 @@
     <string name="routes">Bus routes</string>
     <string name="bus_stops">Bus stops</string>
     <string name="no_result">No results</string>
+    <string name="unknown_error_on_server_side">Unknown error occurred on server side</string>
+    <string name="no_internet">No internet connection</string>
 </resources>

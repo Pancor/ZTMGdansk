@@ -10,7 +10,11 @@ interface SearchBusContract {
 
     interface View : BaseView {
 
-        fun emptyResultFromServer()
+        fun onEmptyResultFromServer()
+
+        fun onUnknownErrorOnServerSide()
+
+        fun onNoInternetConnection()
     }
 
     interface Presenter : BasePresenter<View> {

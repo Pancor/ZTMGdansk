@@ -82,10 +82,18 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
         noResultView.visibility = View.GONE
     }
 
-    override fun emptyResultFromServer() {
+    override fun onEmptyResultFromServer() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.GONE
         noResultView.visibility = View.VISIBLE
+    }
+
+    override fun onUnknownErrorOnServerSide() {
+        //TODO
+    }
+
+    override fun onNoInternetConnection() {
+        //TODO
     }
 
     interface SearchResult {

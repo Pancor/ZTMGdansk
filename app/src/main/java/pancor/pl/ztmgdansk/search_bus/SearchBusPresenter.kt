@@ -27,12 +27,11 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
                 .doOnNext { view.showLoadingIndicator() }
                 .observeOn(schedulers.io())
                 .flatMap { busDataManager.getBusStopsAndRoutesByQuery(it) }
-                .map { result ->
-                    if (!result.isError) {
-                        mergeRoutesWithStopsAndAddHeaders(result.routes, result.stops)
-                    } else {
-                        arrayListOf()
+                .map { (isError, resultCode, routes, stops) ->
+                    if (isError) {
+                        resolveError(resultCode)
                     }
+                    mergeRoutesWithStopsAndAddHeaders(routes, stops)
                 }
                 .observeOn(schedulers.ui())
                 .filter { returnTrueWhenListIsNotEmpty(it)}
@@ -53,9 +52,17 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
         return searchResultData
     }
 
+    private fun resolveError(errorCode: Int) {
+        when (errorCode) {
+            Result.UNKNOWN_ERROR -> view.onUnknownErrorOnServerSide()
+            Result.NO_INTERNET_CONNECTION -> view.onNoInternetConnection()
+            else -> throw IllegalArgumentException("Could not resolve errorCode: $errorCode")
+        }
+    }
+
     private fun returnTrueWhenListIsNotEmpty(list: ArrayList<SearchResultData>): Boolean {
         if (list.isEmpty()) {
-            view.emptyResultFromServer()
+            view.onEmptyResultFromServer()
             return false
         } else {
             return true
