@@ -1,6 +1,5 @@
 package pancor.pl.ztmgdansk.search_bus
 
-import android.content.res.Resources
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -11,8 +10,6 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.holder_bus_stop.view.*
 import kotlinx.android.synthetic.main.holder_header.view.*
 import kotlinx.android.synthetic.main.holder_route.view.*
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.BaseViewHolder
@@ -27,11 +24,9 @@ import javax.inject.Inject
 class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvider) :
         RecyclerView.Adapter<BaseViewHolder>(), SearchBusFragment.SearchResult {
 
-    private lateinit var resources: Resources
     private var searchResultData: List<SearchResultData> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        resources = parent.context.resources
         val inflater = LayoutInflater.from(parent.context)
         when (viewType) {
             HEADER_VIEW_TYPE -> {
@@ -77,7 +72,7 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
 
         override fun bindView(position: Int) {
             val header = searchResultData[position].model as Header
-            itemView.headerTitle.text = resources.getString(header.title)
+            itemView.headerTitle.setText(header.title)
         }
     }
 
