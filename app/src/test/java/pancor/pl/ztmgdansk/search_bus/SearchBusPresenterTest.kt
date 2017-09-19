@@ -2,10 +2,8 @@ package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -45,9 +43,9 @@ class SearchBusPresenterTest {
     fun writeSearchQueryThenCheckResult() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(STOP))
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE),
-                SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.BUS_STOP), HEADER_VIEW_TYPE),
                 SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -101,7 +99,7 @@ class SearchBusPresenterTest {
     fun whenBusStopsListIsEmptyThenReturnOnlyRoutesList() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -114,7 +112,7 @@ class SearchBusPresenterTest {
     fun whenRoutesListIsEmptyThenReturnOnlyBusStopsList() {
         setExpectedDataResultFromDataManager(listOf(), listOf(STOP))
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.BUS_STOP), HEADER_VIEW_TYPE),
                 SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -136,7 +134,7 @@ class SearchBusPresenterTest {
     @Test
     fun whenRoutesListIsNotEmptyThenAddHeader() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf())
-        val expectedResult = arrayListOf(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+        val expectedResult = arrayListOf(SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -148,7 +146,7 @@ class SearchBusPresenterTest {
     @Test
     fun whenBusStopListIsNotEmptyThenAddHeader() {
         setExpectedDataResultFromDataManager(listOf(), listOf(STOP))
-        val expectedResult = arrayListOf(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE),
+        val expectedResult = arrayListOf(SearchResultData(Header(Header.BUS_STOP), HEADER_VIEW_TYPE),
                 SearchResultData(STOP, BUS_STOP_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -181,7 +179,7 @@ class SearchBusPresenterTest {
     fun whenNoInternetThenStillShowDataFromLocalSource() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(), Result.NO_INTERNET_CONNECTION)
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))
@@ -194,7 +192,7 @@ class SearchBusPresenterTest {
     fun whenUnknownErrorOnServerSideOccurredThenStillShowDataFromLocalSource() {
         setExpectedDataResultFromDataManager(listOf(ROUTE), listOf(), Result.UNKNOWN_ERROR)
         val expectedResult = arrayListOf(
-                SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE),
+                SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE),
                 SearchResultData(ROUTE, ROUTE_VIEW_TYPE))
 
         presenter.getSearchViewResult(Flowable.just(QUERY))

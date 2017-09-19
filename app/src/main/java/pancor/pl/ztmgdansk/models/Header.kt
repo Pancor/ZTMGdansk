@@ -1,7 +1,10 @@
 package pancor.pl.ztmgdansk.models
 
-data class Header constructor(override val id: Int, val title: Int) : SearchResultData.Model() {
+data class Header constructor(override val id: Int) : SearchResultData.Model() {
 
-    constructor(title: Int): this(title, title)
+    companion object {
+        const val ROUTE = 20
+        const val BUS_STOP = 21
+    }
 }
 

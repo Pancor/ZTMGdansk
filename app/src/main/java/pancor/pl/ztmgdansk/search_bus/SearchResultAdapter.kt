@@ -72,7 +72,16 @@ class SearchResultAdapter @Inject constructor(val schedulers: BaseSchedulerProvi
 
         override fun bindView(position: Int) {
             val header = searchResultData[position].model as Header
-            itemView.headerTitle.setText(header.title)
+            val title = convertConstToResId(header.id)
+            itemView.headerTitle.setText(title)
+        }
+
+        private fun convertConstToResId(const: Int): Int {
+            return when (const) {
+                Header.BUS_STOP -> R.string.bus_stops
+                Header.ROUTE -> R.string.routes
+                else -> throw IllegalArgumentException("Const returned unexpected value: $const")
+            }
         }
     }
 

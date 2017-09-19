@@ -1,7 +1,6 @@
 package pancor.pl.ztmgdansk.search_bus
 
 import io.reactivex.Flowable
-import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.di.ActivityScope
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
@@ -42,11 +41,11 @@ class SearchBusPresenter @Inject constructor(private val busDataManager: BusData
             ArrayList<SearchResultData> {
         val searchResultData = arrayListOf<SearchResultData>()
         if (routes.isNotEmpty()) {
-            searchResultData.add(SearchResultData(Header(R.string.routes), HEADER_VIEW_TYPE))
+            searchResultData.add(SearchResultData(Header(Header.ROUTE), HEADER_VIEW_TYPE))
             routes.mapTo(searchResultData) { SearchResultData(it, ROUTE_VIEW_TYPE) }
         }
         if (stops.isNotEmpty()) {
-            searchResultData.add(SearchResultData(Header(R.string.bus_stops), HEADER_VIEW_TYPE))
+            searchResultData.add(SearchResultData(Header(Header.BUS_STOP), HEADER_VIEW_TYPE))
             stops.mapTo(searchResultData) { SearchResultData(it, BUS_STOP_VIEW_TYPE) }
         }
         return searchResultData
