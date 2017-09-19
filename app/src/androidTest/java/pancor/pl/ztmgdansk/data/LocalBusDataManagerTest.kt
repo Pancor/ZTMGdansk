@@ -40,6 +40,20 @@ class LocalBusDataManagerTest {
     }
 
     @Test
+    fun insertRouteThenGetItBack() {
+        localBusDataManager.insertBusRoutes(ROUTES)
+        val query = "Route"
+        val expectedResult = Result(isError = false, resultCode = Result.OK,
+                routes = ROUTES, stops = listOf())
+
+        localBusDataManager.getBusStopsAndRoutesByQuery(query)
+                .subscribe(testSubscriber)
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertValue(expectedResult)
+    }
+
+    @Test
     fun checkIfPercentageCharactersAreAddedToQuery() {
         localBusDataManager.insertBusStops(STOPS)
         val stop_query = "top"
