@@ -26,13 +26,16 @@ class BusDataManagerTest {
     @Mock
     private lateinit var remoteBusDataManager: BusDataContract
 
+    @Mock
+    private lateinit var cacheBusDataManager: BusDataContract.Cache
+
     private lateinit var busDataManager: BusDataManager
     private lateinit var testSubscriber: TestSubscriber<Any>
 
     @Before
     fun setupBusDataManager() {
         MockitoAnnotations.initMocks(this)
-        busDataManager = BusDataManager(localBusDataManager, remoteBusDataManager)
+        busDataManager = BusDataManager(localBusDataManager, cacheBusDataManager, remoteBusDataManager)
         testSubscriber = TestSubscriber()
     }
 

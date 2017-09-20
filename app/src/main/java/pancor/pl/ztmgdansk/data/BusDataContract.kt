@@ -19,4 +19,9 @@ interface BusDataContract {
 
         fun deleteData()
     }
+
+    interface Cache : BusDataContract {
+
+        fun insertResultToCache(query: String, result: Flowable<Result>)
+    }
 }
