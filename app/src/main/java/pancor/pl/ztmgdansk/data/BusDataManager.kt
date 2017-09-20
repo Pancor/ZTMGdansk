@@ -16,7 +16,6 @@ class BusDataManager @Inject constructor(val localBusDataManager: BusDataContrac
         val networkSourceWithSave: Flowable<Result> = remoteBusDataManager
                 .getBusStopsAndRoutesByQuery(query)
                 .doOnNext { result ->
-                    Log.e("TAG", "DO ON NEXT $result")
                     if (!result.isError) {
                         localBusDataManager.insertBusRoutes(result.routes)
                         localBusDataManager.insertBusStops(result.stops)
