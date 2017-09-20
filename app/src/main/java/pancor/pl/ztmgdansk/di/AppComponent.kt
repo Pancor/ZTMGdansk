@@ -7,7 +7,6 @@ import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import dagger.android.support.DaggerApplication
 import pancor.pl.ztmgdansk.base.App
-import pancor.pl.ztmgdansk.data.BusDataContract
 
 import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.data.BusDataModule
@@ -25,7 +24,7 @@ interface AppComponent : AndroidInjector<DaggerApplication> {
 
     fun inject(app: App)
 
-    fun getBusDataManager(): BusDataContract
+    fun getBusDataManager(): BusDataManager
 
     override fun inject(instance: DaggerApplication)
 

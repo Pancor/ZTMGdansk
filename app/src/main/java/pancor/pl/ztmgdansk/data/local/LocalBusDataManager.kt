@@ -6,6 +6,7 @@ import pancor.pl.ztmgdansk.data.local.database.BusDao
 import pancor.pl.ztmgdansk.models.BusStop
 import pancor.pl.ztmgdansk.models.Result
 import pancor.pl.ztmgdansk.models.Route
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,9 +15,11 @@ class LocalBusDataManager @Inject constructor(private val busDao: BusDao) : BusD
 
     override fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result> {
         return busDao.getBusStopsByQuery("%$query%")
-                .onErrorReturn { listOf() }
+                .onErrorReturn { Timber.d(it)
+                    listOf() }
                 .flatMap { busDao.getRoutesByQuery("%$query%")
-                            .onErrorReturn { listOf() }
+                            .onErrorReturn { Timber.d(it)
+                                listOf() }
                             .map { routes -> Pair(it, routes) }
                 }
                 .map { (stops, routes) -> Result(isError = false, resultCode = Result.OK,

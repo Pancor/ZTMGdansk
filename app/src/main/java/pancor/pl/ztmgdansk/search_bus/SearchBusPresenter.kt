@@ -5,14 +5,14 @@ import pancor.pl.ztmgdansk.di.ActivityScope
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
-import pancor.pl.ztmgdansk.data.BusDataContract
+import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ActivityScope
-class SearchBusPresenter @Inject constructor(private val busDataManager: BusDataContract,
+class SearchBusPresenter @Inject constructor(private val busDataManager: BusDataManager,
                                              private val schedulers: BaseSchedulerProvider): SearchBusContract.Presenter {
 
     private lateinit var view: SearchBusContract.View

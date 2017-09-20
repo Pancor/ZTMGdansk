@@ -38,7 +38,8 @@ class BusDataManagerTest {
 
     @Test
     fun getStopsAndRoutesByQueryThenInsertDataToLocalDatabase() {
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
+                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
         `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)

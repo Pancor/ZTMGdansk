@@ -7,7 +7,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-abstract class BusDaoModule {
+class BusDaoModule {
 
     @Provides
     @Singleton fun provideBusDao(context: Context): BusDao {

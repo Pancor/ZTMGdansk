@@ -1,8 +1,10 @@
 package pancor.pl.ztmgdansk.data
 
+import android.util.Log
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
 import pancor.pl.ztmgdansk.models.Result
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,6 +16,7 @@ class BusDataManager @Inject constructor(val localBusDataManager: BusDataContrac
         val networkSourceWithSave: Flowable<Result> = remoteBusDataManager
                 .getBusStopsAndRoutesByQuery(query)
                 .doOnNext { result ->
+                    Log.e("TAG", "DO ON NEXT $result")
                     if (!result.isError) {
                         localBusDataManager.insertBusRoutes(result.routes)
                         localBusDataManager.insertBusStops(result.stops)

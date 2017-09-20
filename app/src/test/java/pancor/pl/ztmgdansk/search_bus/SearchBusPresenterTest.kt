@@ -7,11 +7,10 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.base.BUS_STOP_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
-import pancor.pl.ztmgdansk.data.BusDataContract
+import pancor.pl.ztmgdansk.data.BusDataManager
 import pancor.pl.ztmgdansk.models.*
 import pancor.pl.ztmgdansk.tools.schedulers.BaseSchedulerProvider
 import pancor.pl.ztmgdansk.tools.schedulers.TrampolineSchedulerProvider
@@ -28,7 +27,7 @@ class SearchBusPresenterTest {
     @Mock
     private lateinit var view: SearchBusContract.View
     @Mock
-    private lateinit var dataManager: BusDataContract
+    private lateinit var dataManager: BusDataManager
 
     @Before
     fun setupSearchBusPresenter() {
