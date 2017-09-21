@@ -8,12 +8,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CacheBusDataManager @Inject constructor(): BusDataContract.Cache {
+class CacheBusDataManager internal constructor(private val factory: Factory): BusDataContract.Cache {
 
-    private val cachedResultFromQuery: LruCache<String, Flowable<Result>> = LruCache(50)
+    @Inject constructor() : this(DefaultFactory)
+
+    private val cache = factory.getCachedResultFromQuery()
 
     override fun getBusStopsAndRoutesByQuery(query: String): Flowable<Result> {
-        val cachedResult = cachedResultFromQuery.get(query)
+        val cachedResult = cache.get(query)
         if (cachedResult != null) {
             return cachedResult
         }
@@ -27,8 +29,16 @@ class CacheBusDataManager @Inject constructor(): BusDataContract.Cache {
     }
 
     override fun insertResultToCache(query: String, result: Flowable<Result>) {
-        if (cachedResultFromQuery.get(query) != null) {
-            cachedResultFromQuery.put(query, result)
+        if (cache.get(query) == null) {
+            cache.put(query, result)
         }
+    }
+
+    internal interface Factory {
+        fun getCachedResultFromQuery(): LruCache<String, Flowable<Result>>
+    }
+
+    private object DefaultFactory: Factory {
+        override fun getCachedResultFromQuery(): LruCache<String, Flowable<Result>> = LruCache(50)
     }
 }
