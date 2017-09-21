@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CacheBusDataManager internal constructor(private val factory: Factory): BusDataContract.Cache {
+class CacheBusDataManager internal constructor(factory: Factory): BusDataContract.Cache {
 
     @Inject constructor() : this(DefaultFactory)
 

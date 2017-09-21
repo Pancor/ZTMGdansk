@@ -4,7 +4,7 @@ import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
-import org.junit.Assert.*
+import org.mockito.Mockito.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,5 +34,17 @@ class CacheBusDataManagerTest {
                 .subscribe(testSubscriber)
 
         testSubscriber.assertValue(result)
+    }
+
+    @Test
+    fun whenThereIsNoResultMatchingQueryThenReturnEmptyResult() {
+        val query = "query"
+        val expectedResult = Result(isError = true, resultCode = Result.NOT_IN_CACHE,
+                routes = listOf(), stops = listOf())
+
+        cacheBusDataManager.getBusStopsAndRoutesByQuery(query)
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(expectedResult)
     }
 }
