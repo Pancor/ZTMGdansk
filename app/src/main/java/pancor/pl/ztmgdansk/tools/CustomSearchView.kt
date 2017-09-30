@@ -6,11 +6,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import kotlinx.android.synthetic.main.view_search.view.*
 import pancor.pl.ztmgdansk.R
-import android.os.AsyncTask.execute
 import io.reactivex.*
-import pancor.pl.ztmgdansk.R.id.searchInputView
 
 class CustomSearchView : Toolbar {
 
@@ -25,6 +24,7 @@ class CustomSearchView : Toolbar {
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_search, this, true)
+        setupDeleteTextFunctionality()
     }
 
     fun setBackNavigationListener(listener: OnBackNavigationClickListener){
@@ -33,12 +33,17 @@ class CustomSearchView : Toolbar {
         }
     }
 
+    private fun setupDeleteTextFunctionality() {
+        deleteTextView.setOnClickListener { searchInputView.setText("") }
+    }
+
     fun getTextChangeObservable(): Observable<String> {
         return Observable.create<String> { subscriber ->
             run {
                 searchInputView.addTextChangedListener(object : TextWatcher {
                     override fun onTextChanged(cs: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
                         subscriber.onNext(cs.toString())
+                        showOrHideDeleteButton(cs)
                     }
 
                     override fun beforeTextChanged(s: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
@@ -50,6 +55,14 @@ class CustomSearchView : Toolbar {
                     }
                 })
             }
+        }
+    }
+
+    private fun showOrHideDeleteButton(text: CharSequence) {
+        if (text.isNotEmpty()) {
+            deleteTextView.visibility = View.VISIBLE
+        } else {
+            deleteTextView.visibility = View.GONE
         }
     }
 
