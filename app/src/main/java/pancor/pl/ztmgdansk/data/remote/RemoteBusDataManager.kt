@@ -19,8 +19,7 @@ class RemoteBusDataManager @Inject constructor(private val netService: NetServic
                         netService.getBusStopsAndRoutesFromSearch(query)
                                 .toFlowable()
                     } else {
-                        Flowable.just(Result(isError = true, resultCode = Result.NO_INTERNET_CONNECTION,
-                                stops = listOf(), routes = listOf()))
+                        Flowable.just(Result(isError = true, resultCode = Result.NO_INTERNET_CONNECTION))
                     }
                 }
     }

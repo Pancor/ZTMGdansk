@@ -39,6 +39,7 @@ class CacheBusDataManager internal constructor(factory: Factory): BusDataContrac
     }
 
     private object DefaultFactory: Factory {
-        override fun getCachedResultFromQuery(): LruCache<String, Flowable<Result>> = LruCache(50)
+        private val CACHE_SIZE = 50
+        override fun getCachedResultFromQuery(): LruCache<String, Flowable<Result>> = LruCache(CACHE_SIZE)
     }
 }

@@ -5,6 +5,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
@@ -16,34 +17,30 @@ class BusDataManagerTest {
 
     val ROUTES = listOf(Route(1, "1", "Route1"), Route(2, "2", "Route2"))
     val STOPS = listOf(BusStop(1, "Stop1"), BusStop(2, "Stop2"))
-    val RESPONSE = Result(isError = false, resultCode = Result.OK, stops = STOPS,
-            routes = ROUTES)
+    val RESULT = Result(isError = false, resultCode = Result.OK, stops = STOPS, routes = ROUTES)
+    val EMPTY_RESULT = Result(isError = false, resultCode = Result.OK)
     val QUERY = "query123"
 
     @Mock
     private lateinit var localBusDataManager: BusDataContract.Local
-
     @Mock
     private lateinit var remoteBusDataManager: BusDataContract
-
     @Mock
     private lateinit var cacheBusDataManager: BusDataContract.Cache
+        private lateinit var busDataManager: BusDataManager
+        private lateinit var testSubscriber: TestSubscriber<Any>
 
-    private lateinit var busDataManager: BusDataManager
-    private lateinit var testSubscriber: TestSubscriber<Any>
-
-    @Before
-    fun setupBusDataManager() {
-        MockitoAnnotations.initMocks(this)
-        busDataManager = BusDataManager(localBusDataManager, cacheBusDataManager, remoteBusDataManager)
+        @Before
+        fun setupBusDataManager() {
+            MockitoAnnotations.initMocks(this)
+            busDataManager = BusDataManager(localBusDataManager, cacheBusDataManager, remoteBusDataManager)
         testSubscriber = TestSubscriber()
     }
 
     @Test
     fun getStopsAndRoutesByQueryThenInsertDataToLocalDatabase() {
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
-                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        setExpectedResultFromLocalAndRemoteSource(EMPTY_RESULT, RESULT)
+        setupEmptyCache()
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe()
@@ -54,10 +51,9 @@ class BusDataManagerTest {
 
     @Test
     fun getStopsAndRoutesByQueryThenDoNotInsertDataToLocalDatabaseWhenIsError() {
-        val resultWithError = Result(isError = true, resultCode = Result.UNKNOWN_ERROR,
-                stops = listOf(), routes = listOf())
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(resultWithError))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(resultWithError))
+        val resultWithError = Result(isError = true, resultCode = Result.UNKNOWN_ERROR)
+        setExpectedResultFromLocalAndRemoteSource(resultWithError, resultWithError)
+        setupEmptyCache()
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe()
@@ -68,37 +64,38 @@ class BusDataManagerTest {
 
     @Test
     fun getRoutesAndStopsByQueryWhenLocalSourceIsNotAvailable() {
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
-                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        setExpectedResultFromLocalAndRemoteSource(EMPTY_RESULT, RESULT)
+        setupEmptyCache()
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertValue(RESPONSE)
+        testSubscriber.assertValue(RESULT)
     }
 
     @Test
     fun getRoutesAndStopsByQueryWhenNoInternet() {
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(
-                Result(isError = false, resultCode = Result.OK, routes = listOf(), stops = listOf())))
+        val noInternetResult = Result(isError = true, resultCode = Result.NO_INTERNET_CONNECTION)
+        setExpectedResultFromLocalAndRemoteSource(RESULT, noInternetResult)
+        setupEmptyCache()
+        val expectedResult = Result(isError = true, resultCode = Result.NO_INTERNET_CONNECTION,
+                routes = ROUTES, stops = STOPS)
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertValue(RESPONSE)
+        testSubscriber.assertValue(expectedResult)
     }
 
     @Test
     fun getRoutesAndStopsWithoutRepetition() {
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
+        setExpectedResultFromLocalAndRemoteSource(RESULT, RESULT)
+        setupEmptyCache()
 
         busDataManager.getBusStopsAndRoutesByQuery(QUERY)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertValue(RESPONSE)
+        testSubscriber.assertValue(RESULT)
     }
 
     @Test
@@ -107,8 +104,8 @@ class BusDataManagerTest {
         val stop = BusStop(23, "Stop23")
         val remoteResult = Result(isError = false, resultCode = Result.OK, routes = listOf(route),
                 stops = listOf(stop))
-        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESPONSE))
-        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(remoteResult))
+        setExpectedResultFromLocalAndRemoteSource(RESULT, remoteResult)
+        setupEmptyCache()
         val expectedResult = Result(isError = false, resultCode = Result.OK, routes = ROUTES.plus(route),
                 stops = STOPS.plus(stop))
 
@@ -116,5 +113,43 @@ class BusDataManagerTest {
                 .subscribe(testSubscriber)
 
         testSubscriber.assertValue(expectedResult)
+    }
+
+    @Test
+    fun whenCacheDataIsEmptyAndNetworkResultIsOkThenInsertResultToCache() {
+        setExpectedResultFromLocalAndRemoteSource(RESULT, RESULT)
+        setupEmptyCache()
+
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe()
+
+        verify(cacheBusDataManager).insertResultToCache(any(), any())
+    }
+
+    @Test
+    fun whenCacheIsNotEmptyThenReturnResultFromIt() {
+        `when`(cacheBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(RESULT))
+        setExpectedResultFromLocalAndRemoteSource(EMPTY_RESULT, EMPTY_RESULT)
+
+        busDataManager.getBusStopsAndRoutesByQuery(QUERY)
+                .subscribe(testSubscriber)
+
+        testSubscriber.assertValue(RESULT)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> any(): T {
+        Mockito.any<T>()
+        return null as T
+    }
+
+    private fun setExpectedResultFromLocalAndRemoteSource(local: Result, remote: Result) {
+        `when`(localBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(local))
+        `when`(remoteBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(remote))
+    }
+
+    private fun setupEmptyCache() {
+        val cacheResult = Result(isError = true, resultCode = Result.NOT_IN_CACHE)
+        `when`(cacheBusDataManager.getBusStopsAndRoutesByQuery(QUERY)).thenReturn(Flowable.just(cacheResult))
     }
 }
