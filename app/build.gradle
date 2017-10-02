@@ -9,12 +9,12 @@ kapt {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "pancor.pl.ztmgdansk"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode getVersionCodeApp()
         versionName getVersionNameApp()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -40,7 +40,7 @@ android {
 }
 
 ext {
-    androidVersion = '25.3.1'
+    androidVersion = '26.0.1'
     glideVersion = '3.7.0'
     daggerVersion = '2.11'
     retrofitVersion = '2.3.0'
@@ -107,6 +107,9 @@ dependencies {
     androidTestCompile "com.android.support:support-annotations:$androidVersion"
     androidTestCompile "com.android.support.test:runner:$androidTestVersion"
     androidTestCompile "com.android.support.test:rules:$androidTestVersion"
+
+    compile 'com.google.android:flexbox:0.3.1'
+    compile 'com.lapism:searchview:4.0'
 }
 repositories {
     mavenCentral()

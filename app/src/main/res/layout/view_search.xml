@@ -7,6 +7,7 @@
     android:layout_height="?attr/actionBarSize"
     android:layout_margin="8dp"
     android:background="@drawable/shape_white_rounded"
+    app:layout_scrollFlags="scroll|enterAlways"
     app:navigationIcon="?attr/homeAsUpIndicator">
 
     <RelativeLayout
