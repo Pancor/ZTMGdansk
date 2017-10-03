@@ -107,9 +107,6 @@ dependencies {
     androidTestCompile "com.android.support:support-annotations:$androidVersion"
     androidTestCompile "com.android.support.test:runner:$androidTestVersion"
     androidTestCompile "com.android.support.test:rules:$androidTestVersion"
-
-    compile 'com.google.android:flexbox:0.3.1'
-    compile 'com.lapism:searchview:4.0'
 }
 repositories {
     mavenCentral()

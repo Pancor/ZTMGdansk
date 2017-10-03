@@ -14,7 +14,6 @@ import pancor.pl.ztmgdansk.base.BaseFragment
 import pancor.pl.ztmgdansk.base.HEADER_VIEW_TYPE
 import pancor.pl.ztmgdansk.base.ROUTE_VIEW_TYPE
 import pancor.pl.ztmgdansk.models.SearchResultData
-import pancor.pl.ztmgdansk.tools.CustomSearchView
 import pancor.pl.ztmgdansk.tools.SearchResultItemDecoration
 import javax.inject.Inject
 
@@ -62,12 +61,13 @@ class SearchBusFragment @Inject constructor(): BaseFragment(), SearchBusContract
         recyclerView.adapter = adapter
     }
 
+    // TODO
     private fun setupDataFlowToRecyclerAdapter() {
-        val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
+        /* val searchViewTextChangeListener = context as CustomSearchView.SearchViewTextChangeListener
         val queryFlowable = searchViewTextChangeListener.getSearchViewTextChangeListener()
         val searchResultFlowable = presenter.getSearchViewResult(queryFlowable)
         val searchResultDisposable = searchResultInterface.setData(searchResultFlowable)
-        disposable.add(searchResultDisposable)
+        disposable.add(searchResultDisposable)*/
     }
 
     override fun showLoadingIndicator() {
