@@ -3,6 +3,7 @@ package pancor.pl.ztmgdansk.search_bus
 import android.os.Bundle
 import dagger.Lazy
 import dagger.android.support.DaggerAppCompatActivity
+import io.reactivex.Flowable
 import kotlinx.android.synthetic.main.act_search_bus.*
 import pancor.pl.ztmgdansk.R
 import pancor.pl.ztmgdansk.R.layout.act_search_bus
@@ -10,7 +11,8 @@ import pancor.pl.ztmgdansk.tools.OtherUtils
 import pancor.pl.ztmgdansk.tools.search.SearchView
 import javax.inject.Inject
 
-class SearchBusActivity : DaggerAppCompatActivity(), SearchView.OnBackArrowClickListener {
+class SearchBusActivity : DaggerAppCompatActivity(), SearchView.OnBackArrowClickListener,
+        SearchView.OnSearchTextChangedListener {
 
     @Inject
     lateinit var presenter: SearchBusPresenter
@@ -24,6 +26,8 @@ class SearchBusActivity : DaggerAppCompatActivity(), SearchView.OnBackArrowClick
         setupFragment()
         setupSearchView()
     }
+
+    override fun getSearchTextChangeObservable() = searchView.getTextChangeObservable()
 
     override fun onBackArrowClick() {
         onBackPressed()

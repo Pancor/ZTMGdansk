@@ -1,11 +1,16 @@
 package pancor.pl.ztmgdansk.tools.search
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.bumptech.glide.Glide
+import io.reactivex.*
+import io.reactivex.functions.Function
 import kotlinx.android.synthetic.main.view_search.view.*
+import org.intellij.lang.annotations.Flow
 import pancor.pl.ztmgdansk.R
 
 
@@ -42,6 +47,22 @@ class SearchView : FrameLayout {
                 .into(rightIcon)
     }
 
+    fun getTextChangeObservable(): Flowable<String> {
+        return Flowable.create({ setupTextChangeSubscriber(it)}, BackpressureStrategy.BUFFER)
+    }
+
+    private fun setupTextChangeSubscriber(subscriber: FlowableEmitter<String>) {
+        searchEditText.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable) { }
+
+            override fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) { }
+
+            override fun onTextChanged(text: CharSequence, p1: Int, p2: Int, p3: Int) {
+                subscriber.onNext(text.toString())
+            }
+        })
+    }
+
     fun setOnBackArrowClickListener(listener: OnBackArrowClickListener) {
         onBackArrowClickListener = listener
         setupOnBackArrowClickListener()
@@ -54,5 +75,10 @@ class SearchView : FrameLayout {
     interface OnBackArrowClickListener {
 
         fun onBackArrowClick()
+    }
+
+    interface OnSearchTextChangedListener {
+
+        fun getSearchTextChangeObservable(): Flowable<String>
     }
 }
