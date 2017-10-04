@@ -5,14 +5,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
-import com.bumptech.glide.Glide
 import io.reactivex.*
-import io.reactivex.functions.Function
 import kotlinx.android.synthetic.main.view_search.view.*
-import org.intellij.lang.annotations.Flow
 import pancor.pl.ztmgdansk.R
-
 
 class SearchView : FrameLayout {
 
@@ -25,26 +22,18 @@ class SearchView : FrameLayout {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        initSearchView()
-    }
-
-    private fun initSearchView() {
         LayoutInflater.from(context).inflate(R.layout.view_search, this, true)
         setupLeftIcon()
         setupRightIcon()
     }
 
     private fun setupLeftIcon() {
-        Glide.with(context)
-                .load(R.drawable.ic_arrow_back_black_24dp)
-                .into(leftIcon)
+        leftIcon.setImageResource(R.drawable.ic_arrow_back_black_24dp) //TODO manage memory usage
     }
 
     private fun setupRightIcon() {
-        Glide.with(context)
-                .load(R.drawable.ic_close_black_24dp)
-                .centerCrop()
-                .into(rightIcon)
+        rightIcon.setImageResource(R.drawable.ic_close_black_24dp) //TODO manage memory usage
+        rightIcon.setOnClickListener{ searchEditText.setText("") }
     }
 
     fun getTextChangeObservable(): Flowable<String> {
@@ -59,8 +48,18 @@ class SearchView : FrameLayout {
 
             override fun onTextChanged(text: CharSequence, p1: Int, p2: Int, p3: Int) {
                 subscriber.onNext(text.toString())
+                showOrHideTextDeleteIcon()
             }
         })
+    }
+
+    private fun showOrHideTextDeleteIcon() {
+        val searchText = searchEditText.text
+        if (searchText.isNotEmpty()) {
+            rightIcon.visibility = View.VISIBLE
+        } else {
+            rightIcon.visibility = View.GONE
+        }
     }
 
     fun setOnBackArrowClickListener(listener: OnBackArrowClickListener) {

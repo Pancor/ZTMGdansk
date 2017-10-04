@@ -15,8 +15,6 @@ class SearchBusActivity : DaggerAppCompatActivity(), SearchView.OnBackArrowClick
         SearchView.OnSearchTextChangedListener {
 
     @Inject
-    lateinit var presenter: SearchBusPresenter
-    @Inject
     lateinit var searchBusFragmentProvider: Lazy<SearchBusFragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
