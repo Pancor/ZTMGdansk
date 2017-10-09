@@ -1,6 +1,8 @@
 package pancor.pl.ztmgdansk.tools.search
 
 import android.content.Context
+import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -13,7 +15,13 @@ import pancor.pl.ztmgdansk.R
 
 class SearchView : FrameLayout {
 
+    companion object {
+        private const val KEY_DELETE_RIGHT_ICON_VISIBILITY = "key_delete_right_icon_visibility"
+        private const val KEY_SUPER_STATE = "key_super_state"
+    }
+
     private lateinit var onBackArrowClickListener: OnBackArrowClickListener
+    private var isDeleteRightIconVisible = false
 
     constructor(context: Context) : super(context, null)
 
@@ -55,11 +63,21 @@ class SearchView : FrameLayout {
 
     private fun showOrHideTextDeleteIcon() {
         val searchText = searchEditText.text
-        if (searchText.isNotEmpty()) {
-            rightIcon.visibility = View.VISIBLE
+        if (searchText.isEmpty()) {
+            hideDeleteRightIcon()
         } else {
-            rightIcon.visibility = View.GONE
+            showDeleteRightIcon()
         }
+    }
+
+    private fun showDeleteRightIcon() {
+        isDeleteRightIconVisible = true
+        rightIcon.visibility = View.VISIBLE
+    }
+
+    private fun hideDeleteRightIcon() {
+        isDeleteRightIconVisible = false
+        rightIcon.visibility = View.GONE
     }
 
     fun setOnBackArrowClickListener(listener: OnBackArrowClickListener) {
@@ -69,6 +87,35 @@ class SearchView : FrameLayout {
 
     private fun setupOnBackArrowClickListener() {
         leftIcon.setOnClickListener{ onBackArrowClickListener.onBackArrowClick() }
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        val state = Bundle()
+        state.putParcelable(KEY_SUPER_STATE, super.onSaveInstanceState())
+        state.putBoolean(KEY_DELETE_RIGHT_ICON_VISIBILITY, isDeleteRightIconVisible)
+        return state
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable) {
+        var savedState = state
+        if (state is Bundle) {
+            savedState = state.getParcelable(KEY_SUPER_STATE)
+            isDeleteRightIconVisible = state.getBoolean(KEY_DELETE_RIGHT_ICON_VISIBILITY)
+            updateView()
+        }
+        super.onRestoreInstanceState(savedState)
+    }
+
+    private fun updateView() {
+        updateDeleteRightIcon()
+    }
+
+    private fun updateDeleteRightIcon() {
+        if (isDeleteRightIconVisible) {
+            showDeleteRightIcon()
+        } else {
+            hideDeleteRightIcon()
+        }
     }
 
     interface OnBackArrowClickListener {
