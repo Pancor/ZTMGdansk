@@ -63,11 +63,6 @@ class SearchView : FrameLayout {
         searchEditText.addTextChangedListener(searchQueryTextWatcher)
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        searchEditText.removeTextChangedListener(searchQueryTextWatcher)
-    }
-
     private fun showOrHideTextDeleteIcon() {
         val searchText = searchEditText.text
         if (searchText.isEmpty()) {
@@ -123,6 +118,11 @@ class SearchView : FrameLayout {
         } else {
             hideDeleteRightIcon()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        searchEditText.removeTextChangedListener(searchQueryTextWatcher)
     }
 
     interface OnBackArrowClickListener {
