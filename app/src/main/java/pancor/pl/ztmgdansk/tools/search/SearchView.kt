@@ -21,6 +21,7 @@ class SearchView : FrameLayout {
     }
 
     private lateinit var onBackArrowClickListener: OnBackArrowClickListener
+    private var searchQueryTextWatcher: TextWatcher? = null
     private var isDeleteRightIconVisible = false
 
     constructor(context: Context) : super(context, null)
@@ -49,7 +50,7 @@ class SearchView : FrameLayout {
     }
 
     private fun setupTextChangeSubscriber(subscriber: FlowableEmitter<String>) {
-        searchEditText.addTextChangedListener(object: TextWatcher {
+        searchQueryTextWatcher = object: TextWatcher {
             override fun afterTextChanged(p0: Editable) { }
 
             override fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) { }
@@ -58,7 +59,13 @@ class SearchView : FrameLayout {
                 subscriber.onNext(text.toString())
                 showOrHideTextDeleteIcon()
             }
-        })
+        }
+        searchEditText.addTextChangedListener(searchQueryTextWatcher)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        searchEditText.removeTextChangedListener(searchQueryTextWatcher)
     }
 
     private fun showOrHideTextDeleteIcon() {
